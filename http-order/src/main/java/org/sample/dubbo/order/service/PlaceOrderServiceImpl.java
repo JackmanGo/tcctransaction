@@ -30,7 +30,7 @@ public class PlaceOrderServiceImpl {
      * @param redPacketPayAmount
      * @return 订单号
      */
-    public String placeOrder(long payerUserId, long shopId, Long productId, BigDecimal redPacketPayAmount) {
+    public String placeOrder(long payerUserId, long shopId, Long productId, BigDecimal redPacketPayAmount) throws RuntimeException{
         Shop shop = shopRepository.findById(shopId);
 
         //生成订单，此时订单的状态为默认 DRAFT

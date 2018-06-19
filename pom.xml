@@ -18,6 +18,8 @@
     <module>http-order</module>
     <module>tcc-transaction-captial</module>
     <module>tcc-transaction-redpacket</module>
+    <module>tcc-transaction-core</module>
+    <module>tcc-transaction-test</module>
   </modules>
 
 </project>

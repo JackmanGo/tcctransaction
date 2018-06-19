@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 public interface ShopDao {
     Shop findById(long id);
+
+    int create(Shop shop);
 }

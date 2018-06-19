@@ -5,6 +5,7 @@ import org.sample.dubbo.order.entity.Order;
 import org.sample.dubbo.order.entity.Product;
 import org.sample.dubbo.order.repository.OrderRepository;
 import org.sample.dubbo.order.repository.ProductRepository;
+import org.sample.dubbo.order.repository.ShopRepository;
 import org.sample.dubbo.order.service.AccountServiceImpl;
 import org.sample.dubbo.order.service.PlaceOrderServiceImpl;
 import org.slf4j.Logger;
@@ -39,6 +40,9 @@ public class OrderController {
     @Autowired
     OrderRepository orderRepository;
 
+    @Autowired
+    ShopRepository repository;
+
     /**
      * 主页
      * @return
@@ -46,6 +50,8 @@ public class OrderController {
     @GetMapping("/")
     public String index() {
 
+        //测试Spring事务传播机制
+        //repository.createFirst();
         return "index";
     }
 

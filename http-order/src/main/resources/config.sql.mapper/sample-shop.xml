@@ -20,4 +20,9 @@
         <include refid="sql_select"/>
         WHERE SHOP_ID = #{id,javaType=java.lang.Long,jdbcType=BIGINT}
     </select>
+
+    <insert id="create" parameterType="org.sample.dubbo.order.entity.Shop">
+
+        insert into ORD_SHOP(SHOP_ID, OWNER_USER_ID) values (#{id}, #{ownerUserId});
+    </insert>
 </mapper>

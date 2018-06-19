@@ -1,5 +1,8 @@
 package org.sample.dubbo.order;
 
+import org.sample.dubbo.order.repository.ShopRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -8,8 +11,11 @@ import org.springframework.context.annotation.ImportResource;
 
 @SpringBootApplication
 @ImportResource(value = {"classpath:config.order.dubbo/*.xml","classpath:config/spring/local/*.xml"})
-public class OrderApplication extends SpringBootServletInitializer {
+public class OrderApplication extends SpringBootServletInitializer implements CommandLineRunner {
     //This SpringBootServletInitializer run a SpringApplication from a traditional WAR deployment
+
+    @Autowired
+    ShopRepository shopRepository;
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
@@ -21,4 +27,8 @@ public class OrderApplication extends SpringBootServletInitializer {
         SpringApplication.run(OrderApplication.class, args);
     }
 
+    @Override
+    public void run(String... strings) throws Exception {
+        shopRepository.createFirst();
+    }
 }

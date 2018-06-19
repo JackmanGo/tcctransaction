@@ -2,10 +2,13 @@ package org.sample.dubbo.order.service;
 
 import org.sample.dubbo.cap.api.CapitalTradeOrderService;
 import org.sample.dubbo.cap.api.dto.CapitalTradeOrderDto;
+import org.sample.dubbo.order.OrderApplication;
 import org.sample.dubbo.order.entity.Order;
 import org.sample.dubbo.order.repository.OrderRepository;
 import org.sample.dubbo.redpacket.api.RedPacketTradeOrderService;
 import org.sample.dubbo.redpacket.api.dto.RedPacketTradeOrderDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -16,6 +19,11 @@ import java.util.Calendar;
 
 @Service
 public class PaymentServiceImpl {
+
+    /**
+     * logger
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(PaymentServiceImpl.class);
 
 
     @Autowired
@@ -28,7 +36,8 @@ public class PaymentServiceImpl {
     private OrderRepository orderRepository;
 
 
-    public void makePayment(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount) {
+    //TODO 需要TCC分布式事务处理，保证订单，钱包，红包数据的一致性
+    public void makePayment(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount) throws RuntimeException{
 
 
         //check if the order status is DRAFT, if no, means that another call makePayment for the same order happened, ignore this call makePayment.
@@ -44,9 +53,12 @@ public class PaymentServiceImpl {
         }
 
         //RPC接口，创建钱包使用记录，并扣除钱包该订单使用金额
-        String result = capitalTradeOrderService.record(buildCapitalTradeOrderDto(order));
+        String capResult = capitalTradeOrderService.record(buildCapitalTradeOrderDto(order));
         //RPC接口，创建红包使用记录，并扣除红包该订单使用金额
-        String result2 = redPacketTradeOrderService.record(buildRedPacketTradeOrderDto(order));
+        String redResult = redPacketTradeOrderService.record(buildRedPacketTradeOrderDto(order));
+
+        LOGGER.info("capital执行结果: ===> {}" + capResult);
+        LOGGER.info("redResult执行结果:===> {}" + redResult);
 
     }
 

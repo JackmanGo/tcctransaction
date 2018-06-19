@@ -22,7 +22,7 @@ public class RedPacketTradeOrderServiceImpl implements RedPacketTradeOrderServic
 
     @Override
     @Transactional
-    public String record(RedPacketTradeOrderDto tradeOrderDto) {
+    public String record(RedPacketTradeOrderDto tradeOrderDto) throws RuntimeException{
 
         try {
             Thread.sleep(1000l);

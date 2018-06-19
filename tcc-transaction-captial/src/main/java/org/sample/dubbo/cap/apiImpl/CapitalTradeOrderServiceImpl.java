@@ -28,7 +28,7 @@ public class CapitalTradeOrderServiceImpl implements CapitalTradeOrderService {
      */
     @Override
     @Transactional
-    public String record(CapitalTradeOrderDto tradeOrderDto) {
+    public String record(CapitalTradeOrderDto tradeOrderDto) throws RuntimeException{
 
         try {
             Thread.sleep(1000l);
@@ -61,8 +61,6 @@ public class CapitalTradeOrderServiceImpl implements CapitalTradeOrderService {
                 capitalAccountRepository.save(transferFromAccount);
             } catch (DataIntegrityViolationException e) {
                 //this exception may happen when insert trade order concurrently, if happened, ignore this insert operation.
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
 

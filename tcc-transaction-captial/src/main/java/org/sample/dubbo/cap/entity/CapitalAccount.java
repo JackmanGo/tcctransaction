@@ -30,12 +30,12 @@ public class CapitalAccount {
         this.id = id;
     }
 
-    public void transferFrom(BigDecimal amount) {
+    public void transferFrom(BigDecimal amount) throws RuntimeException{
 
         this.balanceAmount = this.balanceAmount.subtract(amount);
 
         if (BigDecimal.ZERO.compareTo(this.balanceAmount) > 0) {
-            throw new RuntimeException("余额不足");
+            throw new RuntimeException("钱包余额不足");
         }
 
         transferAmount = transferAmount.add(amount.negate());

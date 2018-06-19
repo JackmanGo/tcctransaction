@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!--启动AspectJ的支持。开始aop扫描service下的分布式事务注解-->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+
+    <!--事务恢复配置-->
+    <bean class="org.mengyun.tcctransaction.spring.recover.DefaultRecoverConfig">
+        <property name="maxRetryCount" value="30"/> <!--最大重试次数-->
+        <property name="recoverDuration" value="5"/> <!--重试的间隔时间-->
+        <property name="cronExpression" value="0/5 * * * * ?"/> <!--定时任务 cron -->
+    </bean>
+
+    <!--事务存储配置-->
+    <bean id="transactionRepository" class="org.mengyun.tcctransaction.repository.RedisTransactionRepository">
+        <property name="keyPrefix" value="TCC:ORD:"/> <!--redis存储前缀-->
+        <property name="jedisPool" ref="jedisPool"/>
+    </bean>
+
+    <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <property name="maxTotal" value="1000"/>
+        <property name="maxWaitMillis" value="1000"/>
+    </bean>
+
+    <bean id="jedisPool" class="redis.clients.jedis.JedisPool">
+        <constructor-arg index="0" ref="jedisPoolConfig"/>
+        <constructor-arg index="1" value="127.0.0.1"/>
+        <constructor-arg index="2" value="6379" type="int"/>
+        <constructor-arg index="3" value="3000" type="int"/>
+        <constructor-arg index="4" type="java.lang.String">
+            <null/>
+        </constructor-arg>
+        <constructor-arg index="5" value="0" type="int"/>
+    </bean>
+
+</beans>

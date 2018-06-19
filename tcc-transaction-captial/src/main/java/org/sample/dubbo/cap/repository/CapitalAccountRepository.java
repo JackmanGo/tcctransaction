@@ -17,7 +17,7 @@ public class CapitalAccountRepository {
         return capitalAccountDao.findByUserId(userId);
     }
 
-    public void save(CapitalAccount capitalAccount) throws Exception {
+    public void save(CapitalAccount capitalAccount) throws RuntimeException {
         int effectCount = capitalAccountDao.update(capitalAccount);
         if (effectCount < 1) {
             throw new RuntimeException("更新失败");

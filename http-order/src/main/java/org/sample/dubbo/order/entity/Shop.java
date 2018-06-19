@@ -6,6 +6,16 @@ public class Shop {
 
     private long ownerUserId;
 
+    public Shop(){
+
+    }
+
+    public Shop(long id, long ownerUserId){
+
+        this.id = id;
+        this.ownerUserId = ownerUserId;
+    }
+
     public long getOwnerUserId() {
         return ownerUserId;
     }
@@ -13,4 +23,6 @@ public class Shop {
     public long getId() {
         return id;
     }
+
+
 }

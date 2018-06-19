@@ -28,11 +28,12 @@ public class RedPacketAccount {
         this.id = id;
     }
 
-    public void transferFrom(BigDecimal amount) {
+    public void transferFrom(BigDecimal amount) throws RuntimeException{
         this.balanceAmount = this.balanceAmount.subtract(amount);
 
         if (BigDecimal.ZERO.compareTo(this.balanceAmount) > 0) {
-            throw new RuntimeException();
+
+            throw new RuntimeException("红包余额不足");
         }
     }
 
