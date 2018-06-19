@@ -1,13 +1,12 @@
 package bean;
 
-import api.TccTransactionContext;
-import api.TccTransactionStatus;
-import api.TccTransactionType;
-import api.TccTransactionXid;
+import api.*;
 import reflect.ParticipantDetail;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Transaction implements Serializable {
 
@@ -27,7 +26,7 @@ public class Transaction implements Serializable {
 
     private ParticipantDetail confirmParticipantDetail;
 
-    private ParticipantDetail
+    private List<Participant> participants = new ArrayList<Participant>();
 
     private long version = 1;
 
@@ -45,6 +44,11 @@ public class Transaction implements Serializable {
         this.xid = context.;
         this.status = TccTransactionStatus.TRYING;
         this.transactionType = TccTransactionType.BRANCH;
+    }
+
+    //添加参与者
+    public void addParticipant(Participant participant){
+        participants.add(participant);
     }
 
     public TccTransactionXid getXid() {

@@ -79,7 +79,7 @@ public class TccTransactionMethodUtils {
      * @param invocationContext
      * @return
      */
-    public Object invokeParticipant(ParticipantDetail invocationContext){
+    public static Object invokeParticipant(ParticipantDetail invocationContext){
 
         //单例获取目标实例
         Object target = FactoryBuilder.factoryOf(invocationContext.getTargetClass()).getInstance();

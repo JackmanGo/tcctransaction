@@ -1,5 +1,6 @@
 package manager;
 
+import api.Participant;
 import api.TccTransactionContext;
 import api.TccTransactionStatus;
 import api.TccTransactionType;
@@ -190,5 +191,15 @@ public class TccTransactionManager {
     public boolean isExistTransaction() {
         Deque<Transaction> transactions = CURRENT.get();
         return transactions != null && !transactions.isEmpty();
+    }
+
+    /**
+     * 存储事务参与者
+     * @param participant
+     */
+    public void enlistParticipant(Participant participant) {
+        Transaction transaction = this.getCurrentTransaction();
+        transaction.addParticipant(participant);
+        transactionRepository.update(transaction);
     }
 }

@@ -30,10 +30,7 @@ public class ShopRepository {
     ShopRepository shopRepository;
 
 
-
-
-
-
+    @Transactional
     public int createFirst(){
        Shop shop1 = new Shop(11, 11);
        shopDao.create(shop1);

@@ -5,6 +5,7 @@ import bean.Transaction;
 import factory.FactoryBuilder;
 import manager.TccTransactionManager;
 import org.aspectj.lang.ProceedingJoinPoint;
+import reflect.ParticipantDetail;
 import utils.TccTransactionMethodUtils;
 
 import java.lang.reflect.Method;
@@ -65,7 +66,23 @@ public class TccTransactionExplorerInterceptor {
         }
 
         //反射confirm 和 cancel的信息
+        Class targetClass = pjp.getTarget().getClass();
+        Method confirmMethod = null;
+        Method cancelMethod = null;
 
+        try {
 
+            confirmMethod = targetClass.getMethod(confirmMethodName, method.getParameterTypes());
+            cancelMethod = targetClass.getMethod(cancelMethodName, method.getParameterTypes());
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+
+        ParticipantDetail confirmParticipant = new ParticipantDetail(targetClass, confirmMethod, pjp.getArgs());
+        ParticipantDetail cancelParticipant = new ParticipantDetail(targetClass, cancelMethod, pjp.getArgs());
+
+        Participant participant = new Participant(transaction.getXid(), confirmParticipant, cancelParticipant);
+
+        transactionManager.enlistParticipant(participant);
     }
 }

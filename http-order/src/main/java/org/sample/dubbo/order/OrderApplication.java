@@ -11,11 +11,8 @@ import org.springframework.context.annotation.ImportResource;
 
 @SpringBootApplication
 @ImportResource(value = {"classpath:config.order.dubbo/*.xml","classpath:config/spring/local/*.xml"})
-public class OrderApplication extends SpringBootServletInitializer implements CommandLineRunner {
+public class OrderApplication extends SpringBootServletInitializer {
     //This SpringBootServletInitializer run a SpringApplication from a traditional WAR deployment
-
-    @Autowired
-    ShopRepository shopRepository;
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
@@ -25,10 +22,5 @@ public class OrderApplication extends SpringBootServletInitializer implements Co
     public static void main(String[] args) {
 
         SpringApplication.run(OrderApplication.class, args);
-    }
-
-    @Override
-    public void run(String... strings) throws Exception {
-        shopRepository.createFirst();
     }
 }
