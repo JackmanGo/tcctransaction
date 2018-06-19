@@ -102,10 +102,16 @@ public class Transaction implements Serializable {
     //提交
     public void commit() {
 
+        for (Participant participant : participants) {
+            participant.commit();
+        }
     }
 
     //回滚
     public void rollback() {
 
+        for (Participant participant : participants) {
+            participant.rollback();
+        }
     }
 }
