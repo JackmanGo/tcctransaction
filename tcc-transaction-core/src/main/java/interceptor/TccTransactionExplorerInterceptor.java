@@ -81,7 +81,8 @@ public class TccTransactionExplorerInterceptor {
         ParticipantDetail confirmParticipant = new ParticipantDetail(targetClass, confirmMethod, pjp.getArgs());
         ParticipantDetail cancelParticipant = new ParticipantDetail(targetClass, cancelMethod, pjp.getArgs());
 
-        Participant participant = new Participant(transaction.getXid(), confirmParticipant, cancelParticipant);
+        Participant participant = new Participant(transaction.getXid(), confirmParticipant,
+                cancelParticipant, transactionComment.transactionContextEditor());
 
         transactionManager.enlistParticipant(participant);
     }

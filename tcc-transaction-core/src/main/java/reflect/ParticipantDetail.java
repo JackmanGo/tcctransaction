@@ -2,6 +2,10 @@ package reflect;
 
 import java.lang.reflect.Method;
 
+/**
+ * 封装反射调用的方法的类
+ *
+ */
 public class ParticipantDetail {
 
     private Class targetClass;

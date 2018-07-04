@@ -1,7 +1,9 @@
 package org.sample.dubbo.order.service;
 
+import api.TccTransaction;
 import org.sample.dubbo.cap.api.CapitalTradeOrderService;
 import org.sample.dubbo.cap.api.dto.CapitalTradeOrderDto;
+import org.sample.dubbo.cap.common.StatusEnum;
 import org.sample.dubbo.order.OrderApplication;
 import org.sample.dubbo.order.entity.Order;
 import org.sample.dubbo.order.repository.OrderRepository;
@@ -35,20 +37,19 @@ public class PaymentServiceImpl {
     @Autowired
     private OrderRepository orderRepository;
 
-
-    //TODO 需要TCC分布式事务处理，保证订单，钱包，红包数据的一致性
+    @TccTransaction(confirmMethod="makePaymentConfirm", cancelMethod = "makePaymentCancel")
     public void makePayment(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount) throws RuntimeException{
 
 
-        //check if the order status is DRAFT, if no, means that another call makePayment for the same order happened, ignore this call makePayment.
-        if (order.getStatus().equals("DRAFT")) {
+        //检查order是否为DRAFT，如果不是，支付请求已被处理
+        if (StatusEnum.DRAFT.getName().equals(order.getStatus())) {
             //更改订单的状态为：PAYING
             order.pay(redPacketPayAmount, capitalPayAmount);
             try {
-                //更新订单的红包支付金额和余额直接金额
+                //更新订单的红包支付金额和余额直接金额：预扣款买家账户金额操作（冻结资金）
                 orderRepository.updateOrder(order);
             } catch (OptimisticLockingFailureException e) {
-                //ignore the concurrently update order exception, ensure idempotency.
+                //忽略更新状态失败
             }
         }
 
@@ -62,7 +63,15 @@ public class PaymentServiceImpl {
 
     }
 
-    //创建与余额rpc调用的参数
+    public void makePaymentConfirm(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount) throws RuntimeException {
+
+    }
+
+    public void makePaymentCancel(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount) throws RuntimeException {
+    }
+
+
+        //创建与余额rpc调用的参数
     private CapitalTradeOrderDto buildCapitalTradeOrderDto(Order order) {
 
         CapitalTradeOrderDto tradeOrderDto = new CapitalTradeOrderDto();

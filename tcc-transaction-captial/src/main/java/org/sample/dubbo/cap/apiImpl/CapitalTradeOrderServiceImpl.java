@@ -1,5 +1,6 @@
 package org.sample.dubbo.cap.apiImpl;
 
+import api.TccTransaction;
 import org.sample.dubbo.cap.api.CapitalTradeOrderService;
 import org.sample.dubbo.cap.api.dto.CapitalTradeOrderDto;
 import org.sample.dubbo.cap.entity.CapTradeOrder;
@@ -27,6 +28,7 @@ public class CapitalTradeOrderServiceImpl implements CapitalTradeOrderService {
      * @return
      */
     @Override
+    @TccTransaction(confirmMethod = "confirmRecord", cancelMethod = "cancelRecord")
     @Transactional
     public String record(CapitalTradeOrderDto tradeOrderDto) throws RuntimeException{
 

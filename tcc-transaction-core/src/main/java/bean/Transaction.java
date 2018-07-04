@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * 使用序列号工具序列化后存储与仓库中，用于事务恢复
+ */
 public class Transaction implements Serializable {
 
     private static final long serialVersionUID = -1L;
@@ -24,8 +27,6 @@ public class Transaction implements Serializable {
 
     private Date lastUpdateTime = new Date();
 
-    private ParticipantDetail confirmParticipantDetail;
-
     private List<Participant> participants = new ArrayList<Participant>();
 
     private long version = 1;
@@ -41,7 +42,7 @@ public class Transaction implements Serializable {
     }
 
     public Transaction(TccTransactionContext context) {
-        this.xid = context.;
+        this.xid = context.getXid();
         this.status = TccTransactionStatus.TRYING;
         this.transactionType = TccTransactionType.BRANCH;
     }

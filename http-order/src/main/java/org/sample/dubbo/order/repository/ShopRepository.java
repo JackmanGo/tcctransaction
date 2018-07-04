@@ -3,6 +3,7 @@ package org.sample.dubbo.order.repository;
 import org.junit.Test;
 import org.sample.dubbo.order.dao.ShopDao;
 import org.sample.dubbo.order.entity.Shop;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -25,7 +26,6 @@ public class ShopRepository {
     /**
      *
      * 测试Spring的事务传播机制
-     */
     @Autowired
     ShopRepository shopRepository;
 
@@ -37,6 +37,7 @@ public class ShopRepository {
        Shop shop2 = new Shop(22, 22);
        shopDao.create(shop2);
        try {
+           ShopRepository shopRepository2 = (ShopRepository) AopContext.currentProxy();
            this.createSecond();
            //shopRepository.createSecond();
        }catch (Exception e){
@@ -55,4 +56,6 @@ public class ShopRepository {
         shopDao.create(shop4);
         return 0;
     }
+
+    **/
 }

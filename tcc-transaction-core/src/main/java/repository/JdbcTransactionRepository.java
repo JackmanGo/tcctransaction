@@ -12,6 +12,9 @@ import java.sql.*;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * JDBC事务存储仓库
+ */
 public class JdbcTransactionRepository implements TransactionRepository {
 
     //TCC会部署于多台系统，但有有可能数据库是同一个，数据库需要分离

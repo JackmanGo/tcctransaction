@@ -4,6 +4,10 @@ import org.springframework.util.SerializationUtils;
 
 import java.io.Serializable;
 
+/**
+ * jdk序列号工具
+ * @param <T>
+ */
 public class JdkSerializer <T extends Serializable> implements ObjectSerializer<T> {
 
 

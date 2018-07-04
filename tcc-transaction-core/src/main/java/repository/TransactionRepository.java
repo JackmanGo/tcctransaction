@@ -6,6 +6,9 @@ import bean.Transaction;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * 事务存储仓库接口
+ */
 public interface TransactionRepository {
 
     int create(Transaction transaction);

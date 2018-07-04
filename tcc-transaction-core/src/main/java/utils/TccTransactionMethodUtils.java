@@ -49,13 +49,13 @@ public class TccTransactionMethodUtils {
         if(propagation.equals(Propagation.REQUIRED) && !isExistingTransaction && context == null){
             return TccTransactionType.ROOT;
         }
-        //如果事务的传播机制为REQUIRES_NEW，无论当前有没有事务都会开启一个新事务
-        else if(propagation.equals(Propagation.REQUIRES_NEW)){
-            return TccTransactionType.ROOT;
-        }
         //如果事务传播机制为REQUIRED，并且已经存在事务，则开启分支事务
         else if(propagation.equals(Propagation.REQUIRED)){
             return TccTransactionType.BRANCH;
+        }
+        //如果事务的传播机制为REQUIRES_NEW，无论当前有没有事务都会开启一个新事务
+        else if(propagation.equals(Propagation.REQUIRES_NEW)){
+            return TccTransactionType.ROOT;
         }
         //如果事务的传播机制为SUPPORTS，并且当前没有事务，则按普通方法执行
         else if(propagation.equals(Propagation.SUPPORTS) && !isExistingTransaction && context == null){
@@ -63,7 +63,7 @@ public class TccTransactionMethodUtils {
         }
         //如果事务的传播机制为SUPPORTS，并且当前存在事务，则开启分支事务
         else if(propagation.equals(Propagation.SUPPORTS)){
-            return TccTransactionType.NORMAL;
+            return TccTransactionType.BRANCH;
         }
         //如果事务的传播机制为MANDATORY，并且当前存在事务，则开启分支事务
         else if(propagation.equals(Propagation.MANDATORY) && isExistingTransaction && context != null){

@@ -5,13 +5,20 @@ import api.TccTransactionContext;
 import api.TccTransactionStatus;
 import api.TccTransactionType;
 import bean.Transaction;
+import exception.TccCancelingException;
+import exception.TccConfirmingException;
+import org.apache.log4j.Logger;
 import repository.TransactionRepository;
 
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
-import java.util.logging.Logger;
 
+
+/**
+ * 事务管理器，提供事务的获取、发起、提交、回滚，添加参与者的新增等方法。
+ *
+ */
 public class TccTransactionManager {
 
     static final Logger logger = Logger.getLogger(TccTransactionManager.class.getSimpleName());
@@ -136,12 +143,13 @@ public class TccTransactionManager {
     private void commitTransaction(Transaction transaction) {
 
         try {
+
             transaction.commit();
             transactionRepository.delete(transaction);
         } catch (Throwable commitException) {
-            //TODO
-            //logger.warn("compensable transaction confirm failed, recovery job will try to confirm later.", commitException);
-            //throw new ConfirmingException(commitException);
+
+            logger.error("提交事务异常", commitException);
+            throw new TccConfirmingException(commitException);
         }
     }
 
@@ -151,8 +159,10 @@ public class TccTransactionManager {
 
             transaction.rollback();
             transactionRepository.delete(transaction);
-        } catch (Throwable rollback) {
-            //TODO
+        } catch (Throwable rollbackException) {
+
+            logger.error("回滚事务异常", rollbackException);
+            throw new TccCancelingException(rollbackException);
         }
     }
 
@@ -194,7 +204,7 @@ public class TccTransactionManager {
     }
 
     /**
-     * 存储事务参与者
+     * 添加事务参与者
      * @param participant
      */
     public void enlistParticipant(Participant participant) {

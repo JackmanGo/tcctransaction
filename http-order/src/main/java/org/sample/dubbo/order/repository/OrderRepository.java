@@ -34,7 +34,6 @@ public class OrderRepository {
         int effectCount = orderDao.update(order);
 
         if (effectCount < 1) {
-            //throw new Exception("update order failed");
             return;
         }
     }

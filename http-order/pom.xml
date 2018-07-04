@@ -17,6 +17,12 @@
     <dependencies>
 
         <dependency>
+            <groupId>com.doctorwork.dwframe</groupId>
+            <artifactId>tcc-transaction-core</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.101tec</groupId>
             <artifactId>zkclient</artifactId>
             <version>0.4</version>

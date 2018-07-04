@@ -1,5 +1,7 @@
 package org.sample.dubbo.order.entity;
 
+import org.sample.dubbo.cap.common.StatusEnum;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -20,7 +22,8 @@ public class Order implements Serializable {
 
     private BigDecimal capitalPayAmount;
 
-    private String status = "DRAFT";
+    //默认草稿状态
+    private String status = StatusEnum.DRAFT.getName();
 
     private String merchantOrderNo;
 
@@ -68,7 +71,7 @@ public class Order implements Serializable {
     public void pay(BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount) {
         this.redPacketPayAmount = redPacketPayAmount;
         this.capitalPayAmount = capitalPayAmount;
-        this.status = "PAYING";
+        this.status = StatusEnum.PAYING.getName();
     }
 
     public BigDecimal getRedPacketPayAmount() {
