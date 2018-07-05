@@ -19,5 +19,5 @@ public interface TransactionRepository {
 
     Transaction findByXid(TccTransactionXid xid);
 
-    List<Transaction> findAllUnmodifiedSince(Date date);
+    List<Transaction> findAllUnfinished(Date date);
 }

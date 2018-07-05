@@ -1,5 +1,6 @@
 package repository;
 
+import api.TccTransactionStatus;
 import api.TccTransactionXid;
 import bean.Transaction;
 import exception.TccTransactionIOException;
@@ -9,6 +10,7 @@ import serializer.ObjectSerializer;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -215,7 +217,47 @@ public class JdbcTransactionRepository implements TransactionRepository {
     }
 
     @Override
-    public List<Transaction> findAllUnmodifiedSince(Date date) {
-        return null;
+    public List<Transaction> findAllUnfinished(Date date) {
+
+        List<Transaction> transactions = new ArrayList<Transaction>();
+
+        Connection connection = null;
+        PreparedStatement stmt = null;
+
+        connection = this.getConnection();
+
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("SELECT GLOBAL_TX_ID, BRANCH_QUALIFIER, CONTENT,STATUS,TRANSACTION_TYPE,CREATE_TIME,LAST_UPDATE_TIME,RETRIED_COUNT,VERSION");
+        builder.append(!StringUtils.isEmpty(domain) ? ",DOMAIN" : "");
+        builder.append("  FROM " + getTableName() + " WHERE LAST_UPDATE_TIME < ?");
+        builder.append(!StringUtils.isEmpty(domain) ? " AND DOMAIN = ?" : "");
+
+        try {
+
+            stmt = connection.prepareStatement(builder.toString());
+            stmt.setTimestamp(1, new Timestamp(date.getTime()));
+
+            if (!StringUtils.isEmpty(domain)) {
+                stmt.setString(2, domain);
+            }
+
+            ResultSet resultSet = stmt.executeQuery();
+
+            while (resultSet.next()) {
+                byte[] transactionBytes = resultSet.getBytes(3);
+                Transaction transaction = (Transaction) serializer.deserialize(transactionBytes);
+                transaction.setStatus(TccTransactionStatus.valueOf(resultSet.getInt(4)));
+                transaction.setLastUpdateTime(resultSet.getDate(7));
+                transaction.setVersion(resultSet.getLong(9));
+                transaction.resetRetriedCount(resultSet.getInt(8));
+                transactions.add(transaction);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return transactions;
     }
 }

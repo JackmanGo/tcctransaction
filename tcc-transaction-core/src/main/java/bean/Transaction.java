@@ -115,4 +115,13 @@ public class Transaction implements Serializable {
             participant.rollback();
         }
     }
+
+    public void addRetriedCount() {
+        this.retriedCount++;
+    }
+
+    public void resetRetriedCount(int retriedCount) {
+        this.retriedCount = retriedCount;
+    }
+
 }
