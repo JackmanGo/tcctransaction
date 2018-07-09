@@ -13,17 +13,24 @@ public class ParticipantDetail implements Serializable {
     private static final long serialVersionUID = -1L;
 
     private Class targetClass;
-    private Method method;
+
+    //这个类需要序列化，不能使用Method类，该类无法序列号
+    //private Method method;
+    private String methodName;
+
+    private Class[] parameterTypes;
+
     private Object[] args;
 
     public ParticipantDetail(){
 
     }
 
-    public ParticipantDetail(Class targetClass, Method method, Object[] args){
+    public ParticipantDetail(Class targetClass, String methodName, Class[] parameterTypes, Object[] args){
 
         this.targetClass = targetClass;
-        this.method = method;
+        this.methodName = methodName;
+        this.parameterTypes = parameterTypes;
         this.args = args;
     }
 
@@ -35,12 +42,20 @@ public class ParticipantDetail implements Serializable {
         this.targetClass = targetClass;
     }
 
-    public Method getMethod() {
-        return method;
+    public String getMethodName() {
+        return methodName;
     }
 
-    public void setMethod(Method method) {
-        this.method = method;
+    public void setMethodName(String methodName) {
+        this.methodName = methodName;
+    }
+
+    public Class[] getParameterTypes() {
+        return parameterTypes;
+    }
+
+    public void setParameterTypes(Class[] parameterTypes) {
+        this.parameterTypes = parameterTypes;
     }
 
     public Object[] getArgs() {

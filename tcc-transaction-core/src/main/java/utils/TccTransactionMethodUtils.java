@@ -83,7 +83,15 @@ public class TccTransactionMethodUtils {
 
         //单例获取目标实例
         Object target = FactoryBuilder.factoryOf(invocationContext.getTargetClass()).getInstance();
-        Method method = invocationContext.getMethod();
+        String methodName = invocationContext.getMethodName();
+        Class[] parameterTypes = invocationContext.getParameterTypes();
+
+        Method method = null;
+        try {
+            method = target.getClass().getMethod(methodName, parameterTypes);
+        } catch (NoSuchMethodException e) {
+            //TODO throw
+        }
 
         Object returnValue = null;
         try {
