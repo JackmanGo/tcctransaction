@@ -26,7 +26,6 @@ public class TccTransactionManager {
     static final Logger logger = Logger.getLogger(TccTransactionManager.class.getSimpleName());
 
     //事务的持久化存储
-    @Autowired
     private TransactionRepository transactionRepository;
 
     //异步处理

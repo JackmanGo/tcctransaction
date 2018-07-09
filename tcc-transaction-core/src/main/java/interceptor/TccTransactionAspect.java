@@ -14,6 +14,10 @@ public abstract class TccTransactionAspect{
 
     private TccTransactionAspectInterceptor interceptor;
 
+    public void  setInterceptor(TccTransactionAspectInterceptor interceptor){
+        this.interceptor = interceptor;
+    }
+
     @Pointcut("@annotation(api.TccTransaction)")
     public void tccTransactionAspect(){
 

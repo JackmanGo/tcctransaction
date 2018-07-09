@@ -1,12 +1,16 @@
 package reflect;
 
+import java.awt.*;
+import java.io.Serializable;
 import java.lang.reflect.Method;
 
 /**
  * 封装反射调用的方法的类
  *
  */
-public class ParticipantDetail {
+public class ParticipantDetail implements Serializable {
+
+    private static final long serialVersionUID = -1L;
 
     private Class targetClass;
     private Method method;

@@ -15,7 +15,7 @@ public class TccTransactionAspectInterceptor {
 
     static final Logger logger = Logger.getLogger(TccTransactionAspectInterceptor.class.getSimpleName());
 
-    private TccTransactionManager transactionManager = new TccTransactionManager();
+    private TccTransactionManager transactionManager;
 
     public void setTransactionManager(TccTransactionManager transactionManager) {
         this.transactionManager = transactionManager;

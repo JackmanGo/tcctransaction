@@ -100,6 +100,14 @@ public class Transaction implements Serializable {
         this.version = version;
     }
 
+    public TccTransactionType getTransactionType() {
+        return transactionType;
+    }
+
+    public void setTransactionType(TccTransactionType transactionType) {
+        this.transactionType = transactionType;
+    }
+
     //提交
     public void commit() {
 

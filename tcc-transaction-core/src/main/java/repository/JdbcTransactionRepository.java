@@ -62,7 +62,7 @@ public class JdbcTransactionRepository implements TransactionRepository {
 
     protected String getTableName(){
 
-        return StringUtils.isEmpty(suffix)? "TCC_TRANSACTION": "TCC_TRANSACTION_"+suffix;
+        return StringUtils.isEmpty(suffix)? "TCC_TRANSACTION": "TCC_TRANSACTION"+suffix;
     }
 
     protected void releaseConnection(Connection con) {
@@ -97,13 +97,13 @@ public class JdbcTransactionRepository implements TransactionRepository {
             StringBuilder builder = new StringBuilder();
             builder.append("INSERT INTO " + getTableName() +
                     "(GLOBAL_TX_ID,BRANCH_QUALIFIER,TRANSACTION_TYPE,CONTENT,STATUS,RETRIED_COUNT,CREATE_TIME,LAST_UPDATE_TIME,VERSION");
-            builder.append(StringUtils.isEmpty(domain) ? ",DOMAIN ) VALUES (?,?,?,?,?,?,?,?,?,?)" : ") VALUES (?,?,?,?,?,?,?,?,?)");
+            builder.append(!StringUtils.isEmpty(domain) ? ",DOMAIN ) VALUES (?,?,?,?,?,?,?,?,?,?)" : ") VALUES (?,?,?,?,?,?,?,?,?)");
 
             stmt = connection.prepareStatement(builder.toString());
 
             stmt.setBytes(1, transaction.getXid().getGlobalTransactionId());
             stmt.setBytes(2, transaction.getXid().getBranchQualifier());
-            //stmt.setInt(3, transaction.getTransactionType().getId());
+            stmt.setInt(3, transaction.getTransactionType().getId());
             stmt.setBytes(4, serializer.serialize(transaction));
             stmt.setInt(5, transaction.getStatus().getId());
             stmt.setInt(6, transaction.getRetriedCount());
@@ -259,5 +259,15 @@ public class JdbcTransactionRepository implements TransactionRepository {
         }
 
         return transactions;
+    }
+
+    @Override
+    public String toString() {
+        return "JdbcTransactionRepository{" +
+                "domain='" + domain + '\'' +
+                ", suffix='" + suffix + '\'' +
+                ", dataSource=" + dataSource +
+                ", serializer=" + serializer +
+                '}';
     }
 }

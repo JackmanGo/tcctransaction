@@ -20,7 +20,7 @@ public class SpringTccTransactionAspect extends TccTransactionAspect implements 
 
         TccTransactionAspectInterceptor interceptor = new TccTransactionAspectInterceptor();
         interceptor.setTransactionManager(tccTransactionConfigurator.getTransactionManager());
-
+        this.setInterceptor(interceptor);
     }
 
     //最高级(数值最小)和最低级(数值最大)

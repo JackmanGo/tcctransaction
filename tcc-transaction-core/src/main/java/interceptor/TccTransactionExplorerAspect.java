@@ -13,7 +13,11 @@ import org.aspectj.lang.annotation.Pointcut;
 @Aspect
 public abstract class TccTransactionExplorerAspect{
 
-    private TccTransactionExplorerInterceptor tccTransactionExplorerInterceptor;
+    private TccTransactionExplorerInterceptor interceptor;
+
+    public void  setInterceptor(TccTransactionExplorerInterceptor interceptor){
+        this.interceptor = interceptor;
+    }
 
     @Pointcut("@annotation(api.TccTransaction)")
     public void transactionContextCall() {
@@ -23,7 +27,7 @@ public abstract class TccTransactionExplorerAspect{
     @Around("transactionContextCall()")
     public Object interceptTransactionContextMethod(ProceedingJoinPoint pjp) throws Throwable {
 
-        return tccTransactionExplorerInterceptor.interceptTransactionContextMethod(pjp);
+        return interceptor.interceptTransactionContextMethod(pjp);
     }
 
 }

@@ -10,14 +10,19 @@ import repository.TransactionRepository;
  */
 public class SpringTransactionConfigurator implements TccTransactionConfigurator {
 
-    @Autowired
+    //@Autowired
     private TransactionRepository transactionRepository;
     private TccTransactionManager tccTransactionManager;
 
     public void init(){
 
+        System.out.println(transactionRepository);
         tccTransactionManager = new TccTransactionManager();
         tccTransactionManager.setTransactionRepository(transactionRepository);
+    }
+
+    public void setTransactionRepository(TransactionRepository transactionRepository){
+        this.transactionRepository = transactionRepository;
     }
 
     @Override
