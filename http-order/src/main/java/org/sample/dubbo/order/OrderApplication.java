@@ -1,5 +1,6 @@
 package org.sample.dubbo.order;
 
+import config.TccTransactionConfigurator;
 import interceptor.TccTransactionAspect;
 import interceptor.TccTransactionExplorerAspect;
 import org.sample.dubbo.order.repository.ShopRepository;
@@ -13,6 +14,9 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.ImportResource;
+import spring.SpringTccTransactionAspect;
+import spring.SpringTccTransactionExplorerAspect;
+import spring.SpringTransactionConfigurator;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 @ImportResource(value = {"classpath:config.order.dubbo/*.xml","classpath:config/spring/local/*.xml", "classpath:order.tcc/tcc.xml"})
@@ -31,17 +35,28 @@ public class OrderApplication extends SpringBootServletInitializer {
     }
 
     @Bean
-    public TccTransactionAspect getTccTransactionAspect(){
+    public TccTransactionConfigurator getTransactionConfigurator(){
 
-        TccTransactionAspect tccTransactionAspect = new TccTransactionAspect();
+        SpringTransactionConfigurator springTransactionConfigurator = new SpringTransactionConfigurator();
+        return springTransactionConfigurator;
+    }
+    @Bean
+    public TccTransactionAspect getTccTransactionAspect(TccTransactionConfigurator configurator){
+
+        SpringTccTransactionAspect tccTransactionAspect = new SpringTccTransactionAspect();
+        tccTransactionAspect.setTccTransactionConfigurator(configurator);
+
         tccTransactionAspect.init();
         return tccTransactionAspect;
     }
-    @Bean
-    public TccTransactionExplorerAspect getTccTransactionExplorerAspect(){
 
-        TccTransactionExplorerAspect tccTransactionExplorerAspect = new TccTransactionExplorerAspect();
+    @Bean
+    public TccTransactionExplorerAspect getTccTransactionExplorerAspect(TccTransactionConfigurator configurator){
+
+        SpringTccTransactionExplorerAspect tccTransactionExplorerAspect = new SpringTccTransactionExplorerAspect();
+        tccTransactionExplorerAspect.setTccTransactionConfigurator(configurator);
         tccTransactionExplorerAspect.init();
+
         return tccTransactionExplorerAspect;
     }
 }
