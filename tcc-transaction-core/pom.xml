@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>tcc-transaction-core</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
     <build>
         <plugins>
             <plugin>
@@ -61,6 +61,13 @@
             </exclusions>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>localRepository</id>
+            <url>file:/Users/wangxi/.m2/repository</url>
+        </repository>
+    </distributionManagement>
 
 
 </project>

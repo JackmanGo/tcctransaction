@@ -17,11 +17,11 @@
     <bean id="transactionRepository"
           class="repository.JdbcTransactionRepository">
         <property name="dataSource" ref="tccDataSource"/>
-        <property name="domain" value="ORDER"/>
-        <property name="tbSuffix" value="_ORD"/>
+        <property name="domain" value="REDPACKET"/>
+        <property name="suffix" value="_RED"/>
     </bean>
 
-    <util:properties id="tccjdbc" location="classpath:order.tcc/tccjdbc.properties"/>
+    <util:properties id="tccjdbc" location="classpath:redpacket.tcc/tccjdbc.properties"/>
 
     <bean id="tccDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
           destroy-method="close" lazy-init="false">

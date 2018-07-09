@@ -1,10 +1,9 @@
 package org.sample.dubbo.order.service;
 
 import api.TccTransaction;
+import api.TccTransactionContext;
 import org.sample.dubbo.cap.api.CapitalTradeOrderService;
 import org.sample.dubbo.cap.api.dto.CapitalTradeOrderDto;
-import org.sample.dubbo.cap.common.StatusEnum;
-import org.sample.dubbo.order.OrderApplication;
 import org.sample.dubbo.order.entity.Order;
 import org.sample.dubbo.order.repository.OrderRepository;
 import org.sample.dubbo.redpacket.api.RedPacketTradeOrderService;
@@ -17,7 +16,6 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
 
 @Service
 public class PaymentServiceImpl {
@@ -38,11 +36,11 @@ public class PaymentServiceImpl {
     private OrderRepository orderRepository;
 
     @TccTransaction(confirmMethod="makePaymentConfirm", cancelMethod = "makePaymentCancel")
-    public void makePayment(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount) throws RuntimeException{
+    public void makePayment(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount, TccTransactionContext context) throws RuntimeException{
 
-
+        LOGGER.info("makePayment context"+context);
         //检查order是否为DRAFT，如果不是，支付请求已被处理
-        if (StatusEnum.DRAFT.getName().equals(order.getStatus())) {
+        if ("DRAFT".equals(order.getStatus())) {
             //更改订单的状态为：PAYING
             order.pay(redPacketPayAmount, capitalPayAmount);
             try {
@@ -63,11 +61,20 @@ public class PaymentServiceImpl {
 
     }
 
-    public void makePaymentConfirm(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount) throws RuntimeException {
+    public void makePaymentConfirm(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount,  TccTransactionContext context) throws RuntimeException {
 
+        LOGGER.info("order confirm make payment called. time seq");
+
+        Order foundOrder = orderRepository.findByMerchantOrderNo(order.getMerchantOrderNo());
+
+        //check if the trade order status is PAYING, if no, means another call confirmMakePayment happened, return directly, ensure idempotency.
+        if (foundOrder != null && foundOrder.getStatus().equals("PAYING")) {
+            order.confirm();
+            orderRepository.updateOrder(order);
+        }
     }
 
-    public void makePaymentCancel(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount) throws RuntimeException {
+    public void makePaymentCancel(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount,  TccTransactionContext context) throws RuntimeException {
     }
 
 

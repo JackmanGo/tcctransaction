@@ -12,7 +12,7 @@
 
 
     <bean id="orderDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
-          destroy-method="close" lazy-init="false">
+          destroy-method="close" lazy-init="false" primary="true">
         <property name="driverClass" value="#{jdbc['jdbc.driverClassName']}"/>
         <property name="jdbcUrl" value="#{jdbc['jdbc.url']}"/>
         <property name="user" value="#{jdbc['jdbc.username']}"/>

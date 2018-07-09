@@ -8,6 +8,8 @@ import bean.Transaction;
 import exception.TccCancelingException;
 import exception.TccConfirmingException;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import repository.JdbcTransactionRepository;
 import repository.TransactionRepository;
 
 import java.util.Deque;
@@ -24,6 +26,7 @@ public class TccTransactionManager {
     static final Logger logger = Logger.getLogger(TccTransactionManager.class.getSimpleName());
 
     //事务的持久化存储
+    @Autowired
     private TransactionRepository transactionRepository;
 
     //异步处理

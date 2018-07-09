@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 
 @SpringBootApplication
-@ImportResource(locations = {"classpath:capital.dao/*.xml","classpath:capital.dubbo/*.xml"})
+@ImportResource(locations = {"classpath:capital.dao/*.xml","classpath:capital.dubbo/*.xml","classpath:capital.tcc/tcc.xml"})
 @RestController
 public class CapApplication {
 

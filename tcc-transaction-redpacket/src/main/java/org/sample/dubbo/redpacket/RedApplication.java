@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 
 @SpringBootApplication
-@ImportResource(locations = {"classpath:redpacket.dao/*.xml","classpath:redpacket.dubbo/*.xml"})
+@ImportResource(locations = {"classpath:redpacket.dao/*.xml","classpath:redpacket.dubbo/*.xml", "classpath:redpacket.tcc/tcc.xml"})
 @RestController
 public class RedApplication {
 

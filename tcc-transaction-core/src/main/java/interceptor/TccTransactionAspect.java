@@ -13,7 +13,11 @@ import org.springframework.core.Ordered;
 @Aspect
 public class TccTransactionAspect implements Ordered {
 
-    TccTransactionAspectInterceptor interceptor;
+    private TccTransactionAspectInterceptor interceptor;
+
+    public void init(){
+        interceptor = new TccTransactionAspectInterceptor();
+    }
 
     @Pointcut("@annotation(api.TccTransaction)")
     public void tccTransactionAspect(){

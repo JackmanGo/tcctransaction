@@ -14,7 +14,11 @@ import org.springframework.core.Ordered;
 @Aspect
 public class TccTransactionExplorerAspect implements Ordered {
 
-    TccTransactionExplorerInterceptor tccTransactionExplorerInterceptor;
+    private TccTransactionExplorerInterceptor tccTransactionExplorerInterceptor;
+
+    public void init(){
+        tccTransactionExplorerInterceptor = new TccTransactionExplorerInterceptor();
+    }
 
     @Pointcut("@annotation(api.TccTransaction)")
     public void transactionContextCall() {

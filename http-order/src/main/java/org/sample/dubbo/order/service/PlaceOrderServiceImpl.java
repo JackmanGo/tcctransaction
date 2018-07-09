@@ -39,7 +39,7 @@ public class PlaceOrderServiceImpl {
         Boolean result = false;
 
         //执行扣款
-        paymentService.makePayment(order, redPacketPayAmount, order.getTotalAmount().subtract(redPacketPayAmount));
+        paymentService.makePayment(order, redPacketPayAmount, order.getTotalAmount().subtract(redPacketPayAmount),null);
 
         return order.getMerchantOrderNo();
     }

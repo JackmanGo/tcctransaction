@@ -15,7 +15,7 @@ public class TccTransactionAspectInterceptor {
 
     static final Logger logger = Logger.getLogger(TccTransactionAspectInterceptor.class.getSimpleName());
 
-    private TccTransactionManager transactionManager;
+    private TccTransactionManager transactionManager = new TccTransactionManager();
 
     public void setTransactionManager(TccTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
@@ -32,11 +32,15 @@ public class TccTransactionAspectInterceptor {
         TccTransactionContextEditor tccTransactionContextEditor = FactoryBuilder.factoryOf(transaction.transactionContextEditor()).getInstance();
         TccTransactionContext context = tccTransactionContextEditor.get(method,pjp.getArgs());
 
+        logger.info("tranasctioncontext:"+context);
+
         //判断当前是否存在事务
         Boolean isExistTransaction = transactionManager.isExistTransaction();
 
         //判断该次发起事务的类型
         TccTransactionType type = TccTransactionMethodUtils.calculateTransactionType(context, propagation, isExistTransaction);
+
+        logger.info("type:"+type);
 
         if(type == null){
             throw new TccTransactionNOTFoundException(method.getName()+"must run TccTracsactionContext");

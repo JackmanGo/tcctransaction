@@ -14,14 +14,7 @@
         </property>
     </bean-->
 
-    <bean id="transactionRepository"
-          class="repository.JdbcTransactionRepository">
-        <property name="dataSource" ref="tccDataSource"/>
-        <property name="domain" value="REDPACKET"/>
-        <property name="tbSuffix" value="_RED"/>
-    </bean>
-
-    <util:properties id="tccjdbc" location="classpath:redpacket.tcc/tccjdbc.properties"/>
+    <util:properties id="tccjdbc" location="classpath:order.tcc/tccjdbc.properties"/>
 
     <bean id="tccDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
           destroy-method="close" lazy-init="false">
@@ -35,6 +28,13 @@
         <property name="acquireIncrement" value="#{tccjdbc['c3p0.acquireIncrement']}"/>
         <property name="maxIdleTime" value="#{tccjdbc['c3p0.maxIdleTime']}"/>
         <property name="checkoutTimeout" value="#{tccjdbc['c3p0.checkoutTimeout']}"/>
+    </bean>
+
+    <bean id="transactionRepository"
+          class="repository.JdbcTransactionRepository">
+        <property name="dataSource" ref="tccDataSource"/>
+        <property name="domain" value="ORDER"/>
+        <property name="suffix" value="_ORD"/>
     </bean>
 
 </beans>
