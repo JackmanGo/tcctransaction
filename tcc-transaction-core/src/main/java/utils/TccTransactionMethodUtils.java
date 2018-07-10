@@ -7,7 +7,6 @@ import api.TccTransactionType;
 import factory.FactoryBuilder;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
-import reflect.ParticipantDetail;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -76,27 +75,15 @@ public class TccTransactionMethodUtils {
 
     /**
      * 反射调用confirm或cancel
-     * @param invocationContext
+     * @param
      * @return
      */
-    public static Object invokeParticipant(ParticipantDetail invocationContext){
-
-        //单例获取目标实例
-        Object target = FactoryBuilder.factoryOf(invocationContext.getTargetClass()).getInstance();
-        String methodName = invocationContext.getMethodName();
-        Class[] parameterTypes = invocationContext.getParameterTypes();
-
-        Method method = null;
-        try {
-            method = target.getClass().getMethod(methodName, parameterTypes);
-        } catch (NoSuchMethodException e) {
-            //TODO throw
-        }
+    public static Object invokeParticipant(Class target, Method method, Object[] args){
 
         Object returnValue = null;
         try {
 
-            returnValue = method.invoke(target, invocationContext.getArgs());
+            returnValue = method.invoke(target, args);
         } catch (IllegalAccessException | InvocationTargetException e) {
             //TODO throw
         }

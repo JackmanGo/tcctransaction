@@ -5,6 +5,7 @@ import reflect.ParticipantDetail;
 import utils.TccTransactionMethodUtils;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 
 /**
  * 事务参与者：存储事务与其参与者(confirm cancel)的关系
@@ -44,22 +45,37 @@ public class Participant implements Serializable {
 
         //生成TccTransactionContext
         TccTransactionContext context = new TccTransactionContext(xid, TccTransactionStatus.CONFIRMING);
+
+        Method method = null;
+        try {
+            method = confimParticipant.getTargetClass().getMethod(confimParticipant.getMethodName(), confimParticipant.getParameterTypes());
+        } catch (NoSuchMethodException e) {
+            //TODO throw
+        }
         //更新invoke方法时的实参，即赋值TccTransactionContext
         FactoryBuilder.factoryOf(tccTransactionContextEditorClass).getInstance()
-                .set(context, confimParticipant.getMethod(), confimParticipant.getArgs());
+                .set(context, method, confimParticipant.getArgs());
 
-        TccTransactionMethodUtils.invokeParticipant(confimParticipant);
+        TccTransactionMethodUtils.invokeParticipant(confimParticipant.getTargetClass(), method, confimParticipant.getArgs());
     }
 
     public void rollback() {
 
         //生成TccTransactionContext
         TccTransactionContext context = new TccTransactionContext(xid, TccTransactionStatus.CANCELLING);
+
+        Method method = null;
+        try {
+            method = cancelParticipant.getTargetClass().getMethod(confimParticipant.getMethodName(), confimParticipant.getParameterTypes());
+        } catch (NoSuchMethodException e) {
+            //TODO throw
+        }
+
         //更新invoke方法时的实参，即赋值TccTransactionContext
         FactoryBuilder.factoryOf(tccTransactionContextEditorClass).getInstance()
-                .set(context, cancelParticipant.getMethod(), cancelParticipant.getArgs());
+                .set(context, method, cancelParticipant.getArgs());
 
-        TccTransactionMethodUtils.invokeParticipant(cancelParticipant);
+        TccTransactionMethodUtils.invokeParticipant(cancelParticipant.getTargetClass(), method, cancelParticipant.getArgs());
     }
 
     public TccTransactionXid getXid() {
