@@ -56,7 +56,7 @@ public class Participant implements Serializable {
         FactoryBuilder.factoryOf(tccTransactionContextEditorClass).getInstance()
                 .set(context, method, confimParticipant.getArgs());
 
-        TccTransactionMethodUtils.invokeParticipant(confimParticipant.getTargetClass(), method, confimParticipant.getArgs());
+        TccTransactionMethodUtils.invokeParticipant(FactoryBuilder.factoryOf(confimParticipant.getTargetClass()).getInstance(), method, confimParticipant.getArgs());
     }
 
     public void rollback() {
@@ -75,7 +75,7 @@ public class Participant implements Serializable {
         FactoryBuilder.factoryOf(tccTransactionContextEditorClass).getInstance()
                 .set(context, method, cancelParticipant.getArgs());
 
-        TccTransactionMethodUtils.invokeParticipant(cancelParticipant.getTargetClass(), method, cancelParticipant.getArgs());
+        TccTransactionMethodUtils.invokeParticipant(FactoryBuilder.factoryOf(confimParticipant.getTargetClass()).getInstance(), method, cancelParticipant.getArgs());
     }
 
     public TccTransactionXid getXid() {

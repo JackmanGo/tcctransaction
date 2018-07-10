@@ -78,14 +78,14 @@ public class TccTransactionMethodUtils {
      * @param
      * @return
      */
-    public static Object invokeParticipant(Class target, Method method, Object[] args){
+    public static Object invokeParticipant(Object target, Method method, Object[] args){
 
         Object returnValue = null;
         try {
 
             returnValue = method.invoke(target, args);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            //TODO throw
+            e.printStackTrace();
         }
 
         return returnValue;
