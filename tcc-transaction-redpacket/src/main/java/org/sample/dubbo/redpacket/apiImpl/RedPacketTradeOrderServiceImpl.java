@@ -1,5 +1,7 @@
 package org.sample.dubbo.redpacket.apiImpl;
 
+import api.TccTransaction;
+import api.TccTransactionContext;
 import org.sample.dubbo.redpacket.api.RedPacketTradeOrderService;
 import org.sample.dubbo.redpacket.api.dto.RedPacketTradeOrderDto;
 import org.sample.dubbo.redpacket.entity.RedPacketAccount;
@@ -22,14 +24,8 @@ public class RedPacketTradeOrderServiceImpl implements RedPacketTradeOrderServic
 
     @Override
     @Transactional
-    public String record(RedPacketTradeOrderDto tradeOrderDto) throws RuntimeException{
-
-        try {
-            Thread.sleep(1000l);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
+    @TccTransaction(confirmMethod = "confirmRecord", cancelMethod = "cancelRecord")
+    public String record(RedPacketTradeOrderDto tradeOrderDto, TccTransactionContext context) throws RuntimeException{
 
         RedTradeOrder foundTradeOrder = redTradeOrderRepository.findByMerchantOrderNo(tradeOrderDto.getMerchantOrderNo());
 
@@ -61,13 +57,7 @@ public class RedPacketTradeOrderServiceImpl implements RedPacketTradeOrderServic
     }
 
     @Transactional
-    public void confirmRecord(RedPacketTradeOrderDto tradeOrderDto) {
-
-        try {
-            Thread.sleep(1000l);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+    public void confirmRecord(RedPacketTradeOrderDto tradeOrderDto, TccTransactionContext context) {
 
         RedTradeOrder tradeOrder = redTradeOrderRepository.findByMerchantOrderNo(tradeOrderDto.getMerchantOrderNo());
 
@@ -84,14 +74,7 @@ public class RedPacketTradeOrderServiceImpl implements RedPacketTradeOrderServic
     }
 
     @Transactional
-    public void cancelRecord(RedPacketTradeOrderDto tradeOrderDto) {
-
-        try {
-            Thread.sleep(1000l);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
+    public void cancelRecord(RedPacketTradeOrderDto tradeOrderDto, TccTransactionContext context) {
 
         RedTradeOrder tradeOrder = redTradeOrderRepository.findByMerchantOrderNo(tradeOrderDto.getMerchantOrderNo());
 

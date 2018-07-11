@@ -1,6 +1,7 @@
 package org.sample.dubbo.cap.apiImpl;
 
 import api.TccTransaction;
+import api.TccTransactionContext;
 import org.sample.dubbo.cap.api.CapitalTradeOrderService;
 import org.sample.dubbo.cap.api.dto.CapitalTradeOrderDto;
 import org.sample.dubbo.cap.entity.CapTradeOrder;
@@ -30,7 +31,7 @@ public class CapitalTradeOrderServiceImpl implements CapitalTradeOrderService {
     @Override
     @TccTransaction(confirmMethod = "confirmRecord", cancelMethod = "cancelRecord")
     @Transactional
-    public String record(CapitalTradeOrderDto tradeOrderDto) throws RuntimeException{
+    public String record(CapitalTradeOrderDto tradeOrderDto, TccTransactionContext context) throws RuntimeException{
 
         try {
             Thread.sleep(1000l);
@@ -70,7 +71,7 @@ public class CapitalTradeOrderServiceImpl implements CapitalTradeOrderService {
     }
 
     @Transactional
-    public void confirmRecord(CapitalTradeOrderDto tradeOrderDto) {
+    public void confirmRecord(CapitalTradeOrderDto tradeOrderDto, TccTransactionContext context) {
 
         try {
             Thread.sleep(1000l);
@@ -99,7 +100,7 @@ public class CapitalTradeOrderServiceImpl implements CapitalTradeOrderService {
     }
 
     @Transactional
-    public void cancelRecord(CapitalTradeOrderDto tradeOrderDto) throws Exception {
+    public void cancelRecord(CapitalTradeOrderDto tradeOrderDto, TccTransactionContext context) throws Exception {
 
         try {
             Thread.sleep(1000l);
