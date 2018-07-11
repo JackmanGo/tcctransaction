@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.ImportResource;
 import repository.TransactionRepository;
+import spring.SpringBeanFactory;
 import spring.SpringTccTransactionAspect;
 import spring.SpringTccTransactionExplorerAspect;
 import spring.SpringTransactionConfigurator;
@@ -44,6 +45,11 @@ public class OrderApplication extends SpringBootServletInitializer {
     }
 
     @Bean
+    public SpringBeanFactory getSpringBeanFactory(){
+        return new SpringBeanFactory();
+    }
+
+    @Bean
     public TccTransactionConfigurator getTransactionConfigurator(){
 
         SpringTransactionConfigurator springTransactionConfigurator = new SpringTransactionConfigurator();
@@ -53,6 +59,7 @@ public class OrderApplication extends SpringBootServletInitializer {
         logger.info("jdbc===>{}" + springTransactionConfigurator.getTransactionRepository().toString());
         return springTransactionConfigurator;
     }
+
     @Bean
     public TccTransactionAspect getTccTransactionAspect(TccTransactionConfigurator configurator){
 

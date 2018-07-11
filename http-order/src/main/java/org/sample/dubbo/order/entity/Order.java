@@ -112,4 +112,19 @@ public class Order implements Serializable {
     public void updateVersion() {
         version++;
     }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", payerUserId=" + payerUserId +
+                ", payeeUserId=" + payeeUserId +
+                ", redPacketPayAmount=" + redPacketPayAmount +
+                ", capitalPayAmount=" + capitalPayAmount +
+                ", status='" + status + '\'' +
+                ", merchantOrderNo='" + merchantOrderNo + '\'' +
+                ", version=" + version +
+                ", orderLines=" + orderLines +
+                '}';
+    }
 }

@@ -63,7 +63,7 @@ public class PaymentServiceImpl {
 
     public void makePaymentConfirm(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount,  TccTransactionContext context) throws RuntimeException {
 
-        LOGGER.info("order confirm make payment called. time seq");
+        LOGGER.info("order confirm make payment called. MerchantOrderNo===>{}", order.getMerchantOrderNo());
 
         Order foundOrder = orderRepository.findByMerchantOrderNo(order.getMerchantOrderNo());
 
@@ -75,10 +75,21 @@ public class PaymentServiceImpl {
     }
 
     public void makePaymentCancel(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount,  TccTransactionContext context) throws RuntimeException {
+
+        LOGGER.info("order cancel make payment called. MerchantOrderNo===>{}", order.getMerchantOrderNo());
+
+        Order foundOrder = orderRepository.findByMerchantOrderNo(order.getMerchantOrderNo());
+
+        //check if the trade order status is PAYING, if no, means another call confirmMakePayment happened, return directly, ensure idempotency.
+        if (foundOrder != null && foundOrder.getStatus().equals("PAYING")) {
+            order.cancelPayment();
+            orderRepository.updateOrder(order);
+        }
+
     }
 
 
-        //创建与余额rpc调用的参数
+    //创建与余额rpc调用的参数
     private CapitalTradeOrderDto buildCapitalTradeOrderDto(Order order) {
 
         CapitalTradeOrderDto tradeOrderDto = new CapitalTradeOrderDto();

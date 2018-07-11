@@ -24,5 +24,11 @@ public class Shop {
         return id;
     }
 
-
+    @Override
+    public String toString() {
+        return "Shop{" +
+                "id=" + id +
+                ", ownerUserId=" + ownerUserId +
+                '}';
+    }
 }
