@@ -26,7 +26,8 @@ public class TccTransactionAspect implements Ordered {
 
         //TODO
         System.out.println(1);
-        Object obj =  joinPoint.proceed();
+        //Object obj =  joinPoint.proceed(joinPoint.getArgs());
+        Object obj = joinPoint.proceed(new Object[]{"322"});
         System.out.println(4);
 
         return obj;

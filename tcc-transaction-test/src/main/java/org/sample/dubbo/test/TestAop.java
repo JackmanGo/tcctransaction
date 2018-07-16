@@ -13,9 +13,8 @@ public class TestAop {
 
 
     @TccTransaction
-    public String methodFirst(){
-        System.out.println("methodFirst");
-        other.methodSecone();
+    public String methodFirst(String aaa){
+        System.out.println(aaa);
         return "methodFirst";
     }
 

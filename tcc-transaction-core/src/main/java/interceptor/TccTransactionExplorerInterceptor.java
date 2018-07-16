@@ -6,6 +6,7 @@ import factory.FactoryBuilder;
 import manager.TccTransactionManager;
 import org.aspectj.lang.ProceedingJoinPoint;
 import reflect.ParticipantDetail;
+import utils.ReflectionUtils;
 import utils.TccTransactionMethodUtils;
 
 import java.lang.reflect.Method;
@@ -66,7 +67,11 @@ public class TccTransactionExplorerInterceptor {
         }
 
         //反射confirm 和 cancel的信息
-        Class targetClass = pjp.getTarget().getClass();
+        //此次不能直接pjp.getTarget().getClass(); 这个类有可能是实现类，在Spring容器中我们需要获取到继承方法的父类
+        Class targetClassO = pjp.getTarget().getClass();
+        System.out.println(targetClassO);
+        Class targetClass = ReflectionUtils.getDeclaringType(pjp.getTarget().getClass(), method.getName(), method.getParameterTypes());
+        System.out.println(targetClass);
         ParticipantDetail confirmParticipant = new ParticipantDetail(targetClass, confirmMethodName, method.getParameterTypes(), pjp.getArgs());
         ParticipantDetail cancelParticipant = new ParticipantDetail(targetClass, cancelMethodName, method.getParameterTypes(), pjp.getArgs());
 

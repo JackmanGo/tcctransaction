@@ -93,7 +93,13 @@
             <artifactId>spring-boot-starter-logging</artifactId>
         </dependency>
 
-
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>localRepository</id>
+            <url>file:/Users/wangxi/.m2/repository</url>
+        </repository>
+    </distributionManagement>
 
 </project>

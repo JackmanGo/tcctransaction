@@ -39,6 +39,7 @@ public class PaymentServiceImpl {
     public void makePayment(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount, TccTransactionContext context) throws RuntimeException{
 
         LOGGER.info("makePayment context"+context);
+
         //检查order是否为DRAFT，如果不是，支付请求已被处理
         if ("DRAFT".equals(order.getStatus())) {
             //更改订单的状态为：PAYING
@@ -52,9 +53,10 @@ public class PaymentServiceImpl {
         }
 
         //RPC接口，创建钱包使用记录，并扣除钱包该订单使用金额
-        String capResult = capitalTradeOrderService.record(buildCapitalTradeOrderDto(order));
+        String capResult = capitalTradeOrderService.record(buildCapitalTradeOrderDto(order), null);
+        int i = 10/0;
         //RPC接口，创建红包使用记录，并扣除红包该订单使用金额
-        String redResult = redPacketTradeOrderService.record(buildRedPacketTradeOrderDto(order));
+        String redResult = redPacketTradeOrderService.record(buildRedPacketTradeOrderDto(order), null);
 
         LOGGER.info("capital执行结果: ===> {}" + capResult);
         LOGGER.info("redResult执行结果:===> {}" + redResult);

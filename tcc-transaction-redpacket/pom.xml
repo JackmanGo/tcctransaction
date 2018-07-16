@@ -91,14 +91,14 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.doctorwork.dwframe</groupId>
-            <artifactId>tcc-transaction-captial</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-
 
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>localRepository</id>
+            <url>file:/Users/wangxi/.m2/repository</url>
+        </repository>
+    </distributionManagement>
 
 </project>

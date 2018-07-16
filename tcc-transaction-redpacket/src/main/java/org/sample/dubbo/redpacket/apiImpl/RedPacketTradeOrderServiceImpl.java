@@ -56,6 +56,7 @@ public class RedPacketTradeOrderServiceImpl implements RedPacketTradeOrderServic
         return "success";
     }
 
+    @Override
     @Transactional
     public void confirmRecord(RedPacketTradeOrderDto tradeOrderDto, TccTransactionContext context) {
 
@@ -73,6 +74,7 @@ public class RedPacketTradeOrderServiceImpl implements RedPacketTradeOrderServic
         }
     }
 
+    @Override
     @Transactional
     public void cancelRecord(RedPacketTradeOrderDto tradeOrderDto, TccTransactionContext context) {
 

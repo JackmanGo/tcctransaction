@@ -24,6 +24,7 @@ public class TccTransactionExplorerAspect implements Ordered {
         System.out.println(2);
         //Object obj = pjp.proceed(pjp.getArgs());
         Object obj = pjp.proceed();
+        //bject obj = pjp.proceed(new Object[]{"322"});
         System.out.println(3);
 
         return obj;

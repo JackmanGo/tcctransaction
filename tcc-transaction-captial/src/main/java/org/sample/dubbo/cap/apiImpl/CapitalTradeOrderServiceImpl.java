@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 @Component("capitalTradeOrderService")
-public class CapitalTradeOrderServiceImpl implements CapitalTradeOrderService {
+public class CapitalTradeOrderServiceImpl implements CapitalTradeOrderService{
 
     @Autowired
     CapitalAccountRepository capitalAccountRepository;
@@ -32,13 +32,6 @@ public class CapitalTradeOrderServiceImpl implements CapitalTradeOrderService {
     @TccTransaction(confirmMethod = "confirmRecord", cancelMethod = "cancelRecord")
     @Transactional
     public String record(CapitalTradeOrderDto tradeOrderDto, TccTransactionContext context) throws RuntimeException{
-
-        try {
-            Thread.sleep(1000l);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
 
         CapTradeOrder foundTradeOrder = capTradeOrderRepository.findByMerchantOrderNo(tradeOrderDto.getMerchantOrderNo());
 
@@ -70,15 +63,9 @@ public class CapitalTradeOrderServiceImpl implements CapitalTradeOrderService {
         return "success";
     }
 
+    @Override
     @Transactional
     public void confirmRecord(CapitalTradeOrderDto tradeOrderDto, TccTransactionContext context) {
-
-        try {
-            Thread.sleep(1000l);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
 
         CapTradeOrder tradeOrder = capTradeOrderRepository.findByMerchantOrderNo(tradeOrderDto.getMerchantOrderNo());
 
@@ -99,6 +86,7 @@ public class CapitalTradeOrderServiceImpl implements CapitalTradeOrderService {
         }
     }
 
+    @Override
     @Transactional
     public void cancelRecord(CapitalTradeOrderDto tradeOrderDto, TccTransactionContext context) throws Exception {
 
@@ -123,4 +111,18 @@ public class CapitalTradeOrderServiceImpl implements CapitalTradeOrderService {
             capitalAccountRepository.save(capitalAccount);
         }
     }
+
+    //@TccTransaction(confirmMethod = "testTcc1", cancelMethod = "testTcc2")
+    public void testTcc(TccTransactionContext tccTransactionContext){
+        System.out.println(capitalAccountRepository == null);
+    }
+
+    public void testTcc1(TccTransactionContext tccTransactionContext){
+       System.out.println(capitalAccountRepository == null);
+    }
+
+    public void testTcc2(TccTransactionContext tccTransactionContext){
+        System.out.println("testTcc2");
+    }
+
 }

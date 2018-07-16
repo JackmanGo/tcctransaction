@@ -52,6 +52,7 @@ public class Participant implements Serializable {
         } catch (NoSuchMethodException e) {
             //TODO throw
         }
+
         //更新invoke方法时的实参，即赋值TccTransactionContext
         FactoryBuilder.factoryOf(tccTransactionContextEditorClass).getInstance()
                 .set(context, method, confimParticipant.getArgs());
@@ -66,7 +67,7 @@ public class Participant implements Serializable {
 
         Method method = null;
         try {
-            method = cancelParticipant.getTargetClass().getMethod(confimParticipant.getMethodName(), confimParticipant.getParameterTypes());
+            method = cancelParticipant.getTargetClass().getMethod(cancelParticipant.getMethodName(), cancelParticipant.getParameterTypes());
         } catch (NoSuchMethodException e) {
             //TODO throw
         }

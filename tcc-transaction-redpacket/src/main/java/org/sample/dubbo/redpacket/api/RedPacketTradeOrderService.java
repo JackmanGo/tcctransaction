@@ -8,4 +8,6 @@ import org.sample.dubbo.redpacket.api.dto.RedPacketTradeOrderDto;
 public interface RedPacketTradeOrderService {
 
      String record(RedPacketTradeOrderDto tradeOrderDto, TccTransactionContext context) throws RuntimeException;
+     void confirmRecord(RedPacketTradeOrderDto tradeOrderDto, TccTransactionContext context);
+     void cancelRecord(RedPacketTradeOrderDto tradeOrderDto, TccTransactionContext context);
 }

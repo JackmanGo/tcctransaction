@@ -1,7 +1,4 @@
-import org.sample.dubbo.test.TccTransaction;
 import org.sample.dubbo.test.TestAop;
-import org.sample.dubbo.test.TestReflect;
-import org.sample.dubbo.test.TestReflectUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -26,9 +23,8 @@ public class Application implements CommandLineRunner{
 
     @Override
     public void run(String... strings) throws Exception {
-        //testAop.methodFirst();
-        Class[] pars = new Class[]{String.class, String.class};
-        TestReflectUtil.getDeclaringType(TestReflect.class, "say", pars);
+        testAop.methodFirst("123");
+        //Class[] pars = new Class[]{String.class, String.class};
     }
 
 }

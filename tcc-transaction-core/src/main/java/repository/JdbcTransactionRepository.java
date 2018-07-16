@@ -99,6 +99,7 @@ public class JdbcTransactionRepository implements TransactionRepository {
                     "(GLOBAL_TX_ID,BRANCH_QUALIFIER,TRANSACTION_TYPE,CONTENT,STATUS,RETRIED_COUNT,CREATE_TIME,LAST_UPDATE_TIME,VERSION");
             builder.append(!StringUtils.isEmpty(domain) ? ",DOMAIN ) VALUES (?,?,?,?,?,?,?,?,?,?)" : ") VALUES (?,?,?,?,?,?,?,?,?)");
 
+            System.out.println(builder.toString());
             stmt = connection.prepareStatement(builder.toString());
 
             stmt.setBytes(1, transaction.getXid().getGlobalTransactionId());
