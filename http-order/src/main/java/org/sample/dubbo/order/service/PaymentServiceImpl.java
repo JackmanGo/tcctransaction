@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
@@ -36,6 +37,7 @@ public class PaymentServiceImpl {
     private OrderRepository orderRepository;
 
     @TccTransaction(confirmMethod="makePaymentConfirm", cancelMethod = "makePaymentCancel")
+    @Transactional
     public void makePayment(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount, TccTransactionContext context) throws RuntimeException{
 
         LOGGER.info("makePayment context"+context);
@@ -53,10 +55,10 @@ public class PaymentServiceImpl {
         }
 
         //RPC接口，创建钱包使用记录，并扣除钱包该订单使用金额
-        String capResult = capitalTradeOrderService.record(buildCapitalTradeOrderDto(order), null);
+        String capResult = capitalTradeOrderService.record(buildCapitalTradeOrderDto(order), context);
         int i = 10/0;
         //RPC接口，创建红包使用记录，并扣除红包该订单使用金额
-        String redResult = redPacketTradeOrderService.record(buildRedPacketTradeOrderDto(order), null);
+        String redResult = redPacketTradeOrderService.record(buildRedPacketTradeOrderDto(order), context);
 
         LOGGER.info("capital执行结果: ===> {}" + capResult);
         LOGGER.info("redResult执行结果:===> {}" + redResult);
