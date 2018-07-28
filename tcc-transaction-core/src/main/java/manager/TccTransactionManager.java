@@ -68,7 +68,17 @@ public class TccTransactionManager {
         return transaction;
     }
 
+    public Transaction branchExistBegin(TccTransactionContext transactionContext)  {
+        Transaction transaction = transactionRepository.findByXid(transactionContext.getXid());
 
+        if (transaction != null) {
+            transaction.setStatus(transactionContext.getStatus());
+            registerTransaction(transaction);
+            return transaction;
+        }
+        //TODO 处理else
+        return null;
+    }
     /**
      * 提交事务，从ThreadLocal中获取事务 更改状态 执行注解中的commit方法
      * TODO 待处理commit发生异常的流程和异步超时问题
@@ -147,7 +157,7 @@ public class TccTransactionManager {
         try {
 
             transaction.commit();
-            transactionRepository.delete(transaction);
+            //transactionRepository.delete(transaction);
         } catch (Throwable commitException) {
 
             logger.error("提交事务异常", commitException);
@@ -160,7 +170,7 @@ public class TccTransactionManager {
         try {
 
             transaction.rollback();
-            transactionRepository.delete(transaction);
+            //transactionRepository.delete(transaction);
         } catch (Throwable rollbackException) {
 
             logger.error("回滚事务异常", rollbackException);

@@ -113,19 +113,33 @@ public class TccTransactionAspectInterceptor {
 
         Transaction transaction = null;
 
-        switch (context.getStatus()) {
+        try {
 
-            case TRYING:
-                //传播发起分支事务。
-                //发起分支事务完成后，调用 ProceedingJoinPoint#proceed() 方法，执行方法原逻辑( 即 Try 逻辑 )。
-                transaction = transactionManager.branchNewBegin(context);
-                return pjp.proceed();
-            case CONFIRMING:
-                //TODO
-                break;
-            case CANCELLING:
-                //TODO
-                break;
+            switch (context.getStatus()) {
+
+                case TRYING:
+                    //传播发起分支事务。
+                    //发起分支事务完成后，调用 ProceedingJoinPoint#proceed() 方法，执行方法原逻辑( 即 Try 逻辑 )。
+                    transaction = transactionManager.branchNewBegin(context);
+                    return pjp.proceed();
+
+                    //问题：怎么触发的CONFIRMING 或  CANCELLING
+                    //答：分支事务完成后并不会立即调用confrim或cancel
+                    //在确定root事务成功后调用CONFIRMING，如果root事务事务失败调用CANCELLING
+                case CONFIRMING:
+                    transaction = transactionManager.branchExistBegin(context);
+                    transactionManager.commit(asyncConfirm);
+                    break;
+                case CANCELLING:
+                    transaction = transactionManager.branchExistBegin(context);
+                    transactionManager.commit(asyncCancel);
+                    break;
+            }
+        }catch (Exception e){
+
+        }finally {
+
+            transactionManager.cleanAfterCompletion(transaction);
         }
 
         //TODO
