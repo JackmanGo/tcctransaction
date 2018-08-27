@@ -1,8 +1,10 @@
-package recover;
+package recoverJob;
 
 import org.quartz.Scheduler;
 import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
 import org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean;
+import recover.RecoverConfig;
+import recover.TransactionRecovery;
 
 public class RecoverScheduledJob {
 

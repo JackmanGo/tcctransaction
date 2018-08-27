@@ -81,12 +81,8 @@ public class TransactionRecovery {
                     transactionRepository.update(transaction);
                     transaction.rollback();
                     transactionRepository.delete(transaction);
-
-                    //TODO
-                } else if (false) {
-
                 }
-            } catch (Exception e) {
+            } catch (Throwable throwable) {
                 //TODO
             }
 

@@ -8,7 +8,7 @@
     <aop:aspectj-autoproxy proxy-target-class="true"/>
 
     <!--事务恢复配置-->
-    <bean class="org.mengyun.tcctransaction.spring.recover.DefaultRecoverConfig">
+    <bean class="org.mengyun.tcctransaction.spring.recoverJob.DefaultRecoverConfig">
         <property name="maxRetryCount" value="30"/> <!--最大重试次数-->
         <property name="recoverDuration" value="5"/> <!--重试的间隔时间-->
         <property name="cronExpression" value="0/5 * * * * ?"/> <!--定时任务 cron -->

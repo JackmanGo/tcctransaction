@@ -1,4 +1,6 @@
-package recover;
+package recoverJob;
+
+import recover.RecoverConfig;
 
 public class DefaultRecoverConfig implements RecoverConfig {
 

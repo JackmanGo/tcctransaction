@@ -24,7 +24,7 @@ import spring.SpringTransactionConfigurator;
 import java.util.logging.Logger;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
-@ImportResource(value = {"classpath:config.order.dubbo/*.xml","classpath:config/spring/local/*.xml", "classpath:order.tcc/tcc.xml"})
+@ImportResource(value = {"classpath:config.order.dubbo/*.xml","classpath:config/spring/local/*.xml", "classpath:order.tcc/tcc.xml.backups"})
 @EnableAspectJAutoProxy
 public class OrderApplication extends SpringBootServletInitializer {
     //This SpringBootServletInitializer run a SpringApplication from a traditional WAR deployment

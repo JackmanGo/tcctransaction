@@ -124,16 +124,17 @@ public class TccTransactionAspectInterceptor {
                     return pjp.proceed();
 
                     //问题：怎么触发的CONFIRMING 或  CANCELLING
-                    //答：分支事务完成后并不会立即调用confrim或cancel
-                    //在确定root事务成功后调用CONFIRMING，如果root事务事务失败调用CANCELLING
+                    //答：在事务的commit/cancel中再次调用另一个tcc事务。
+                    //此时原事务会调用commit/cancel而终止，branchExistBegin则会开启新的事务
                 case CONFIRMING:
                     transaction = transactionManager.branchExistBegin(context);
                     transactionManager.commit(asyncConfirm);
                     break;
                 case CANCELLING:
                     transaction = transactionManager.branchExistBegin(context);
-                    transactionManager.commit(asyncCancel);
+                    transactionManager.rollback(asyncCancel);
                     break;
+
             }
         }catch (Exception e){
 

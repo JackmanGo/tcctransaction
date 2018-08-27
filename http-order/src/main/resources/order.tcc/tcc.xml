@@ -3,7 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <!--bean class="recover.DefaultRecoverConfig">
+    <!--bean class="recoverJob.DefaultRecoverConfig">
         <property name="maxRetryCount" value="30"/>
         <property name="recoverDuration" value="60"/>
         <property name="cronExpression" value="0/30 * * * * ?"/>
@@ -37,4 +37,23 @@
         <property name="suffix" value="_ORD"/>
     </bean>
 
+    <!--事务恢复配置-->
+    <bean id="recoverConfig" class="recoverJob.DefaultRecoverConfig">
+        <property name="maxRetryCount" value="30"/> <!--最大重试次数-->
+        <property name="recoverDuration" value="5"/> <!--重试的间隔时间-->
+        <property name="cronExpression" value="0/5 * * * * ?"/> <!--定时任务 cron -->
+    </bean>
+
+    <bean id="recoverScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean"/>
+
+    <bean id="transactionRecovery" class="recover.TransactionRecovery">
+        <property name="transactionConfigurator" ref="transactionConfigurator"/>
+    </bean>
+
+    <bean id="recoverScheduledJob" class="recoverJob.RecoverScheduledJob"
+          init-method="init">
+        <property name="transactionRecovery" ref="transactionRecovery"/>
+        <property name="recoverConfig" ref="recoverConfig"/>
+        <property name="scheduler" ref="recoverScheduler"/>
+    </bean>
 </beans>

@@ -78,6 +78,7 @@ public class TccTransactionExplorerInterceptor {
         Participant participant = new Participant(transaction.getXid(), confirmParticipant,
                 cancelParticipant, transactionComment.transactionContextEditor());
 
+        //添加事务参与者
         transactionManager.enlistParticipant(participant);
     }
 }
