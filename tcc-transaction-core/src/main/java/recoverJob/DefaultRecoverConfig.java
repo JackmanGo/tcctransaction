@@ -8,7 +8,7 @@ public class DefaultRecoverConfig implements RecoverConfig {
 
     private int recoverDuration = 120; //120 seconds
 
-    private String cronExpression = "0 */1 * * * ?";
+    private String cronExpression = "0 */3 * * * ?";
 
     public void setMaxRetryCount(int maxRetryCount) {
         this.maxRetryCount = maxRetryCount;

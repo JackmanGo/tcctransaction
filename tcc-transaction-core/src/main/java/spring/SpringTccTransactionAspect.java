@@ -6,6 +6,8 @@ import interceptor.TccTransactionAspectInterceptor;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.core.Ordered;
 
+import java.util.Set;
+
 @Aspect
 public class SpringTccTransactionAspect extends TccTransactionAspect implements Ordered {
 
@@ -20,6 +22,8 @@ public class SpringTccTransactionAspect extends TccTransactionAspect implements 
 
         TccTransactionAspectInterceptor interceptor = new TccTransactionAspectInterceptor();
         interceptor.setTransactionManager(tccTransactionConfigurator.getTransactionManager());
+        interceptor.setDelayCancelExceptions(tccTransactionConfigurator.getDelayCancelExceptions());
+
         this.setInterceptor(interceptor);
     }
 

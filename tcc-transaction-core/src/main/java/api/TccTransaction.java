@@ -42,7 +42,7 @@ public @interface TccTransaction {
             int position = getTccTransactionContextParamPosition(method);
 
             if(position < 0 || position >= args.length){
-                throw new RuntimeException("TccTransactionContext NOT FOUND");
+                throw new RuntimeException("Param TccTransactionContext Not Found");
             }
 
             return (TccTransactionContext) args[position];
@@ -58,7 +58,7 @@ public @interface TccTransaction {
             }
         }
 
-        //获取方法中上下午参数的位置
+        //获取方法中上下文参数的位置
         private int getTccTransactionContextParamPosition(Method method){
 
             if(method == null){

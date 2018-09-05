@@ -2,13 +2,15 @@ package interceptor;
 
 import api.*;
 import bean.Transaction;
-import exception.TccTransactionNOTFoundException;
+import exception.TccTransactionNotFoundException;
 import factory.FactoryBuilder;
 import manager.TccTransactionManager;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import utils.TccTransactionMethodUtils;
 
 import java.lang.reflect.Method;
+import java.util.Set;
 import java.util.logging.Logger;
 
 public class TccTransactionAspectInterceptor {
@@ -16,6 +18,16 @@ public class TccTransactionAspectInterceptor {
     static final Logger logger = Logger.getLogger(TccTransactionAspectInterceptor.class.getSimpleName());
 
     private TccTransactionManager transactionManager;
+
+    private Set<Class<? extends Exception>> delayCancelExceptions;
+
+    public void setDelayCancelExceptions(Set<Class<? extends Exception>> delayCancelExceptions) {
+        this.delayCancelExceptions = delayCancelExceptions;
+    }
+
+    public Set<Class<? extends Exception>> getDelayCancelExceptions() {
+        return this.delayCancelExceptions;
+    }
 
     public void setTransactionManager(TccTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
@@ -30,9 +42,9 @@ public class TccTransactionAspectInterceptor {
 
         //获取事务上下文
         TccTransactionContextEditor tccTransactionContextEditor = FactoryBuilder.factoryOf(transaction.transactionContextEditor()).getInstance();
-        TccTransactionContext context = tccTransactionContextEditor.get(method,pjp.getArgs());
+        TccTransactionContext context = tccTransactionContextEditor.get(method, pjp.getArgs());
 
-        logger.info("tranasctioncontext:"+context);
+        logger.info("tranasctioncontext:" + context);
 
         //判断当前是否存在事务
         Boolean isExistTransaction = transactionManager.isExistTransaction();
@@ -40,13 +52,13 @@ public class TccTransactionAspectInterceptor {
         //判断该次发起事务的类型
         TccTransactionType type = TccTransactionMethodUtils.calculateTransactionType(context, propagation, isExistTransaction);
 
-        logger.info("type:"+type);
+        logger.info("type:" + type);
 
-        if(type == null){
-            throw new TccTransactionNOTFoundException(method.getName()+"must run TccTracsactionContext");
+        if (type == null) {
+            throw new TccTransactionNotFoundException(method.getName() + "must run TccTracsactionContext");
         }
 
-        switch (type){
+        switch (type) {
 
             //发起根事务
             case ROOT:
@@ -64,6 +76,7 @@ public class TccTransactionAspectInterceptor {
 
     /**
      * 开启根事务
+     *
      * @param pjp
      * @param asyncConfirm
      * @param asyncCancel
@@ -80,18 +93,25 @@ public class TccTransactionAspectInterceptor {
             //执行业务方法
             try {
                 returnValue = pjp.proceed();
-            } catch (Throwable throwable) {
+            } catch (Throwable tryingException) {
 
-                //TODO 部分异常不适合立即回滚。例如：是否为延迟取消回滚
-                //执行业务方法发送异常，此时TccTransaction状态处于trying状态
-                //此时业务如果没有开启原子性操作，则需要执行rollback
-                transactionManager.rollback(asyncCancel);
-                throw throwable;
+                //部分异常不适合立即回滚。例如：是否为超时异常或TCC的AOP拦截的第二阶段的乐观锁（更新事务的参与者信息）更新失败异常
+                if (isDelayCancelException(tryingException)) {
+                    //乐观锁更新失败异常（更新事务的参与者信息），尝试重新更新。
+                    transactionManager.syncTransaction();
+                } else {
+
+                    //执行业务方法发送异常，此时TccTransaction状态处于trying状态
+                    //此时业务如果没有开启原子性操作，则需要执行rollback
+                    transactionManager.rollback(asyncCancel);
+                }
+                throw tryingException;
+
             }
 
             //提交事务
             transactionManager.commit(asyncConfirm);
-        }finally {
+        } finally {
 
             //无论业务代码执行成功与否，执行了rollback或 commit后，该事务已完结
             //cleanAfterCompletion方法一定被执行，即从当前线程队列中删除该数据
@@ -104,6 +124,7 @@ public class TccTransactionAspectInterceptor {
 
     /**
      * 当前已存在事务，开启分支事务
+     *
      * @param pjp
      * @param asyncConfirm
      * @param asyncCancel
@@ -123,22 +144,28 @@ public class TccTransactionAspectInterceptor {
                     transaction = transactionManager.branchNewBegin(context);
                     return pjp.proceed();
 
-                    //问题：怎么触发的CONFIRMING 或  CANCELLING
-                    //答：在事务的commit/cancel中再次调用另一个tcc事务。
-                    //此时原事务会调用commit/cancel而终止，branchExistBegin则会开启新的事务
+                //问题：怎么触发的CONFIRMING 或  CANCELLING
+                //答：在事务恢复时，根事务发起者的恢复器会加载所有的分支事务出来依次通过AOP来调用。
+                //此时只需要根据事务的状态来调用CONFIRMING 或 CANCELLING 无须proceed
                 case CONFIRMING:
-                    transaction = transactionManager.branchExistBegin(context);
+                    try {
+                        transaction = transactionManager.branchExistBegin(context);
+                    } catch (TccTransactionNotFoundException e) {
+
+                    }
                     transactionManager.commit(asyncConfirm);
                     break;
                 case CANCELLING:
-                    transaction = transactionManager.branchExistBegin(context);
+                    try {
+                        transaction = transactionManager.branchExistBegin(context);
+                    } catch (TccTransactionNotFoundException e) {
+
+                    }
                     transactionManager.rollback(asyncCancel);
                     break;
 
             }
-        }catch (Exception e){
-
-        }finally {
+        } finally {
 
             transactionManager.cleanAfterCompletion(transaction);
         }
@@ -146,4 +173,22 @@ public class TccTransactionAspectInterceptor {
         //TODO
         return null;
     }
+
+    private boolean isDelayCancelException(Throwable throwable) {
+
+        if (delayCancelExceptions != null) {
+            for (Class delayCancelException : delayCancelExceptions) {
+
+                Throwable rootCause = ExceptionUtils.getRootCause(throwable);
+
+                if (delayCancelException.isAssignableFrom(throwable.getClass())
+                        || (rootCause != null && delayCancelException.isAssignableFrom(rootCause.getClass()))) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
 }

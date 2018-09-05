@@ -7,6 +7,8 @@ import api.TccTransactionType;
 import bean.Transaction;
 import exception.TccCancelingException;
 import exception.TccConfirmingException;
+import exception.TccSystemException;
+import exception.TccTransactionNotFoundException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import repository.JdbcTransactionRepository;
@@ -68,7 +70,7 @@ public class TccTransactionManager {
         return transaction;
     }
 
-    public Transaction branchExistBegin(TccTransactionContext transactionContext)  {
+    public Transaction branchExistBegin(TccTransactionContext transactionContext) throws TccTransactionNotFoundException {
         Transaction transaction = transactionRepository.findByXid(transactionContext.getXid());
 
         if (transaction != null) {
@@ -76,12 +78,13 @@ public class TccTransactionManager {
             registerTransaction(transaction);
             return transaction;
         }
-        //TODO 处理else
-        return null;
+
+        //处理异常
+        throw new TccTransactionNotFoundException();
     }
     /**
      * 提交事务，从ThreadLocal中获取事务 更改状态 执行注解中的commit方法
-     * TODO 待处理commit发生异常的流程和异步超时问题
+     *
      *
      * @param asyncCommit
      */
@@ -94,14 +97,24 @@ public class TccTransactionManager {
         if (asyncCommit) {
 
             //异步提交事务
-            executorService.submit(new Runnable() {
-                @Override
-                public void run() {
-                    commitTransaction(transaction);
-                }
-            });
+            //异步超时问题
+            try {
 
-            return;
+                executorService.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        commitTransaction(transaction);
+                    }
+                });
+
+                return;
+            }catch (Throwable commitException){
+
+                logger.warn("transaction async commit failed, recovery job will try to commit later.", commitException);
+                throw new TccConfirmingException(commitException);
+            }
+
+
         }
 
         commitTransaction(transaction);
@@ -109,8 +122,8 @@ public class TccTransactionManager {
     }
 
     /**
-     * 提交事务，从ThreadLocal中获取事务 更改状态 执行注解中的rollback方法
-     * TODO 待处理rollback发生异常的流程和异步超时问题
+     * 回滚事务，从ThreadLocal中获取当前事务 更改状态 执行注解中的rollback方法
+     *
      *
      * @param asyncCancel
      */
@@ -122,17 +135,34 @@ public class TccTransactionManager {
 
         if (asyncCancel) {
 
-            //异步回滚事务
-            executorService.submit(new Runnable() {
-                @Override
-                public void run() {
-                    rollbackTransaction(transaction);
-                }
-            });
-            return;
+            try {
+
+
+                //异步回滚事务
+                executorService.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        rollbackTransaction(transaction);
+                    }
+                });
+                return;
+            }catch (Throwable rollbackException){
+
+                logger.warn("transaction async rollback failed, recovery job will try to rollback later.", rollbackException);
+                throw new TccConfirmingException(rollbackException);
+            }
         }
 
         rollbackTransaction(transaction);
+    }
+
+    public void syncTransaction() {
+
+        final Transaction transaction = getCurrentTransaction();
+        /**
+         * update the transaction to persist the participant context info
+         */
+        transactionRepository.update(transaction);
     }
 
     /**

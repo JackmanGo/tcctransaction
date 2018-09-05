@@ -1,5 +1,6 @@
 package api;
 
+import exception.TccSystemException;
 import factory.FactoryBuilder;
 import reflect.ParticipantDetail;
 import utils.TccTransactionMethodUtils;
@@ -50,7 +51,8 @@ public class Participant implements Serializable {
         try {
             method = confimParticipant.getTargetClass().getMethod(confimParticipant.getMethodName(), confimParticipant.getParameterTypes());
         } catch (NoSuchMethodException e) {
-            //TODO throw
+
+            throw new TccSystemException(e.getMessage());
         }
 
         //更新invoke方法时的实参，即赋值TccTransactionContext
@@ -69,7 +71,8 @@ public class Participant implements Serializable {
         try {
             method = cancelParticipant.getTargetClass().getMethod(cancelParticipant.getMethodName(), cancelParticipant.getParameterTypes());
         } catch (NoSuchMethodException e) {
-            //TODO throw
+
+            throw new TccSystemException(e);
         }
 
         //更新invoke方法时的实参，即赋值TccTransactionContext

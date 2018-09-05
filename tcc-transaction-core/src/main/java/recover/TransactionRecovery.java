@@ -3,7 +3,10 @@ package recover;
 import api.TccTransactionStatus;
 import bean.Transaction;
 import com.alibaba.fastjson.JSON;
+import exception.TccOptimisticLockException;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
+import recoverJob.DefaultRecoverConfig;
 import repository.TransactionRepository;
 
 import java.util.Calendar;
@@ -20,14 +23,14 @@ public class TransactionRecovery {
 
     private TransactionRepository transactionRepository;
 
-    private RecoverConfig recoverConfig;
-
+    private RecoverConfig recoverConfig = new DefaultRecoverConfig();
 
     /**
      * 开始尝试恢复事务
      */
     public void startRecover() {
 
+        logger.info("事务恢复job");
         List<Transaction> transactions = loadErrorTransactions();
 
         recoverErrorTransactions(transactions);
@@ -83,10 +86,32 @@ public class TransactionRecovery {
                     transactionRepository.delete(transaction);
                 }
             } catch (Throwable throwable) {
-                //TODO
+                //如果catch到TccOptimisticLockException 异常，忽视它
+                if(throwable instanceof TccOptimisticLockException
+                        ||
+                        ExceptionUtils.getRootCause(throwable) instanceof TccOptimisticLockException){
+                    logger.warn(String.format("optimisticLockException happened while recover. txid:%s, status:%s,retried count:%d,transaction content:%s", transaction.getXid(), transaction.getStatus().getId(), transaction.getRetriedCount(), JSON.toJSONString(transaction)), throwable);
+                }else {
+                    logger.error(String.format("recover failed, txid:%s, status:%s,retried count:%d,transaction content:%s", transaction.getXid(), transaction.getStatus().getId(), transaction.getRetriedCount(), JSON.toJSONString(transaction)), throwable);
+                }
             }
 
         }
     }
 
+    public TransactionRepository getTransactionRepository() {
+        return transactionRepository;
+    }
+
+    public void setTransactionRepository(TransactionRepository transactionRepository) {
+        this.transactionRepository = transactionRepository;
+    }
+
+    public RecoverConfig getRecoverConfig() {
+        return recoverConfig;
+    }
+
+    public void setRecoverConfig(RecoverConfig recoverConfig) {
+        this.recoverConfig = recoverConfig;
+    }
 }
