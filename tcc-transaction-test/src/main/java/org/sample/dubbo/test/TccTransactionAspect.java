@@ -24,7 +24,6 @@ public class TccTransactionAspect implements Ordered {
     //@Around("execution(* org.sample.dubbo.test.TestAop.*(..))")
     public Object interceptTccTransactionMethod(ProceedingJoinPoint joinPoint) throws Throwable {
 
-        //TODO
         System.out.println(1);
         //Object obj =  joinPoint.proceed(joinPoint.getArgs());
         Object obj = joinPoint.proceed(new Object[]{"322"});
