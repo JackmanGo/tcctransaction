@@ -5,6 +5,7 @@ import api.TccTransactionContext;
 import api.TccTransactionStatus;
 import api.TccTransactionType;
 import bean.Transaction;
+import com.alibaba.fastjson.JSON;
 import exception.TccCancelingException;
 import exception.TccConfirmingException;
 import exception.TccSystemException;
@@ -252,6 +253,9 @@ public class TccTransactionManager {
     public void enlistParticipant(Participant participant) {
         Transaction transaction = this.getCurrentTransaction();
         transaction.addParticipant(participant);
+        System.out.println("==================================");
+        System.out.println(JSON.toJSONString(participant));
+        System.out.println("==================================");
         transactionRepository.update(transaction);
     }
 }

@@ -5,6 +5,7 @@ import api.TccTransactionContext;
 import org.sample.dubbo.cap.api.CapitalTradeOrderService;
 import org.sample.dubbo.cap.api.dto.CapitalTradeOrderDto;
 import org.sample.dubbo.order.entity.Order;
+import org.sample.dubbo.order.proxy.OrderRpcServiceProxy;
 import org.sample.dubbo.order.repository.OrderRepository;
 import org.sample.dubbo.redpacket.api.RedPacketTradeOrderService;
 import org.sample.dubbo.redpacket.api.dto.RedPacketTradeOrderDto;
@@ -28,11 +29,7 @@ public class PaymentServiceImpl {
 
 
     @Autowired
-    @Qualifier("captialTradeOrderService")
-    CapitalTradeOrderService capitalTradeOrderService;
-    @Autowired
-    @Qualifier("redPacketTradeOrderService")
-    RedPacketTradeOrderService redPacketTradeOrderService;
+    private OrderRpcServiceProxy rpcServiceProxy;
     @Autowired
     private OrderRepository orderRepository;
 
@@ -55,10 +52,10 @@ public class PaymentServiceImpl {
         }
 
         //RPC接口，创建钱包使用记录，并扣除钱包该订单使用金额
-        String capResult = capitalTradeOrderService.record(buildCapitalTradeOrderDto(order), context);
+        String capResult = rpcServiceProxy.capitalRecord(buildCapitalTradeOrderDto(order), context);
         int i = 10/0;
         //RPC接口，创建红包使用记录，并扣除红包该订单使用金额
-        String redResult = redPacketTradeOrderService.record(buildRedPacketTradeOrderDto(order), context);
+        String redResult = rpcServiceProxy.redPacketRecord(buildRedPacketTradeOrderDto(order), context);
 
         LOGGER.info("capital执行结果: ===> {}" + capResult);
         LOGGER.info("redResult执行结果:===> {}" + redResult);

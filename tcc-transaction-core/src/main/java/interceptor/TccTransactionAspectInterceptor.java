@@ -144,9 +144,11 @@ public class TccTransactionAspectInterceptor {
                     transaction = transactionManager.branchNewBegin(context);
                     return pjp.proceed();
 
-                //问题：怎么触发的CONFIRMING 或  CANCELLING
-                //答：在事务恢复时，根事务发起者的恢复器会加载所有的分支事务出来依次通过AOP来调用。
-                //此时只需要根据事务的状态来调用CONFIRMING 或 CANCELLING 无须proceed
+                //问题：怎么触发此次的CONFIRMING 或  CANCELLING
+                //答：在tcc事务中开启rpc调用过程中，如果rpc服务提供方也需要开启tcc事务，则该服务提供方的tcc事务一定是分支事务
+                //而该分支事务完成后并不会调用confirm或cancel。必须等根事务全部确认完成后来依次调用confirm或cancel
+                //而在根事务确认可以调用confirm或cancel后，便由根事务通过TccTransactionContext来传递当前事务的状态到分支事务中
+                //分支事务通过TccTransactionContext的status为confirm或cancel来调用TCC注解中的方法，此时不需要再次调用pjp.proceed()
                 case CONFIRMING:
                     try {
                         transaction = transactionManager.branchExistBegin(context);
