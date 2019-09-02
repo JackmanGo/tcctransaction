@@ -46,14 +46,14 @@
 
     <bean id="recoverScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean"/>
 
-    <bean id="transactionRecovery" class="recover.TransactionRecovery">
+    <!--bean id="transactionRecovery" class="recover.TransactionRecovery">
         <property name="transactionConfigurator" ref="transactionConfigurator"/>
-    </bean>
+    </bean-->
 
-    <bean id="recoverScheduledJob" class="recoverJob.RecoverScheduledJob"
+    <!--bean id="recoverScheduledJob" class="recoverJob.RecoverScheduledJob"
           init-method="init">
         <property name="transactionRecovery" ref="transactionRecovery"/>
         <property name="recoverConfig" ref="recoverConfig"/>
         <property name="scheduler" ref="recoverScheduler"/>
-    </bean>
+    </bean-->
 </beans>

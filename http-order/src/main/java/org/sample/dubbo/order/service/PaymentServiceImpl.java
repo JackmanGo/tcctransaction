@@ -2,17 +2,15 @@ package org.sample.dubbo.order.service;
 
 import api.TccTransaction;
 import api.TccTransactionContext;
-import org.sample.dubbo.cap.api.CapitalTradeOrderService;
-import org.sample.dubbo.cap.api.dto.CapitalTradeOrderDto;
+import com.tcc.transaction.api.cap.dto.CapitalTradeOrderDto;
+import com.tcc.transaction.api.redpacket.dto.RedPacketTradeOrderDto;
+import org.sample.dubbo.order.common.OrderStatus;
 import org.sample.dubbo.order.entity.Order;
 import org.sample.dubbo.order.proxy.OrderRpcServiceProxy;
 import org.sample.dubbo.order.repository.OrderRepository;
-import org.sample.dubbo.redpacket.api.RedPacketTradeOrderService;
-import org.sample.dubbo.redpacket.api.dto.RedPacketTradeOrderDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,56 +31,65 @@ public class PaymentServiceImpl {
     @Autowired
     private OrderRepository orderRepository;
 
-    @TccTransaction(confirmMethod="makePaymentConfirm", cancelMethod = "makePaymentCancel")
-    @Transactional
-    public void makePayment(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount, TccTransactionContext context) throws RuntimeException{
+    @TccTransaction(confirmMethod = "makePaymentConfirm", cancelMethod = "makePaymentCancel")
+    @Transactional(rollbackFor = Throwable.class)
+    public void makePayment(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount, TccTransactionContext context) throws RuntimeException {
 
-        LOGGER.info("makePayment context"+context);
+        LOGGER.info("makePayment context" + context);
 
-        //检查order是否为DRAFT，如果不是，支付请求已被处理
-        if ("DRAFT".equals(order.getStatus())) {
-            //更改订单的状态为：PAYING
-            order.pay(redPacketPayAmount, capitalPayAmount);
-            try {
-                //更新订单的红包支付金额和余额直接金额：预扣款买家账户金额操作（冻结资金）
-                orderRepository.updateOrder(order);
-            } catch (OptimisticLockingFailureException e) {
-                //忽略更新状态失败
-            }
-        }
+        //更新订单的红包支付金额和余额直接金额：预扣款买家账户金额操作（冻结资金）
+        order.pay(redPacketPayAmount, capitalPayAmount);
+        orderRepository.updateOrder(order);
+
 
         //RPC接口，创建钱包使用记录，并扣除钱包该订单使用金额
         String capResult = rpcServiceProxy.capitalRecord(buildCapitalTradeOrderDto(order), context);
-        int i = 10/0;
+
         //RPC接口，创建红包使用记录，并扣除红包该订单使用金额
-        String redResult = rpcServiceProxy.redPacketRecord(buildRedPacketTradeOrderDto(order), context);
-
+        if(order.getRedPacketAmount().compareTo(BigDecimal.ZERO)>0) {
+            String redResult = rpcServiceProxy.redPacketRecord(buildRedPacketTradeOrderDto(order), context);
+            LOGGER.info("redResult执行结果:===> {}" + redResult);
+        }
         LOGGER.info("capital执行结果: ===> {}" + capResult);
-        LOGGER.info("redResult执行结果:===> {}" + redResult);
-
     }
 
-    public void makePaymentConfirm(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount,  TccTransactionContext context) throws RuntimeException {
+    /**
+     * tcc事务确认
+     * @param order
+     * @param redPacketPayAmount
+     * @param capitalPayAmount
+     * @param context
+     * @throws RuntimeException
+     */
+    public void makePaymentConfirm(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount, TccTransactionContext context) throws RuntimeException {
 
-        LOGGER.info("order confirm make payment called. MerchantOrderNo===>{}", order.getMerchantOrderNo());
+        LOGGER.info("order confirm make payment called. orderNo===>{}", order.getOrderNo());
 
-        Order foundOrder = orderRepository.findByMerchantOrderNo(order.getMerchantOrderNo());
+        Order foundOrder = orderRepository.findByMerchantOrderNo(order.getOrderNo());
 
         //check if the trade order status is PAYING, if no, means another call confirmMakePayment happened, return directly, ensure idempotency.
-        if (foundOrder != null && foundOrder.getStatus().equals("PAYING")) {
+        if (foundOrder != null && foundOrder.getStatus().equals(OrderStatus.START)) {
             order.confirm();
             orderRepository.updateOrder(order);
         }
     }
 
-    public void makePaymentCancel(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount,  TccTransactionContext context) throws RuntimeException {
+    /**
+     * tcc事务回滚
+     * @param order
+     * @param redPacketPayAmount
+     * @param capitalPayAmount
+     * @param context
+     * @throws RuntimeException
+     */
+    public void makePaymentCancel(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount, TccTransactionContext context) throws RuntimeException {
 
-        LOGGER.info("order cancel make payment called. MerchantOrderNo===>{}", order.getMerchantOrderNo());
+        LOGGER.info("order cancel make payment called. MerchantOrderNo===>{}", order.getOrderNo());
 
-        Order foundOrder = orderRepository.findByMerchantOrderNo(order.getMerchantOrderNo());
+        Order foundOrder = orderRepository.findByMerchantOrderNo(order.getOrderNo());
 
         //check if the trade order status is PAYING, if no, means another call confirmMakePayment happened, return directly, ensure idempotency.
-        if (foundOrder != null && foundOrder.getStatus().equals("PAYING")) {
+        if (foundOrder != null && foundOrder.getStatus().equals(OrderStatus.START)) {
             order.cancelPayment();
             orderRepository.updateOrder(order);
         }
@@ -94,11 +101,11 @@ public class PaymentServiceImpl {
     private CapitalTradeOrderDto buildCapitalTradeOrderDto(Order order) {
 
         CapitalTradeOrderDto tradeOrderDto = new CapitalTradeOrderDto();
-        tradeOrderDto.setAmount(order.getCapitalPayAmount());
-        tradeOrderDto.setMerchantOrderNo(order.getMerchantOrderNo());
-        tradeOrderDto.setSelfUserId(order.getPayerUserId());
-        tradeOrderDto.setOppositeUserId(order.getPayeeUserId());
-        tradeOrderDto.setOrderTitle(String.format("order no:%s", order.getMerchantOrderNo()));
+        tradeOrderDto.setAmount(order.getCapitalAmount());
+        tradeOrderDto.setMerchantOrderNo(order.getOrderNo());
+        tradeOrderDto.setSelfUserId(order.getBuyerUserId());
+        tradeOrderDto.setOppositeUserId(order.getSellerUserId());
+        tradeOrderDto.setOrderTitle(String.format("order no:%s", order.getOrderNo()));
 
         return tradeOrderDto;
     }
@@ -106,11 +113,11 @@ public class PaymentServiceImpl {
     //创建与红包rpc调用的参数
     private RedPacketTradeOrderDto buildRedPacketTradeOrderDto(Order order) {
         RedPacketTradeOrderDto tradeOrderDto = new RedPacketTradeOrderDto();
-        tradeOrderDto.setAmount(order.getRedPacketPayAmount());
-        tradeOrderDto.setMerchantOrderNo(order.getMerchantOrderNo());
-        tradeOrderDto.setSelfUserId(order.getPayerUserId());
-        tradeOrderDto.setOppositeUserId(order.getPayeeUserId());
-        tradeOrderDto.setOrderTitle(String.format("order no:%s", order.getMerchantOrderNo()));
+        tradeOrderDto.setAmount(order.getRedPacketAmount());
+        tradeOrderDto.setMerchantOrderNo(order.getOrderNo());
+        tradeOrderDto.setSelfUserId(order.getBuyerUserId());
+        tradeOrderDto.setOppositeUserId(order.getSellerUserId());
+        tradeOrderDto.setOrderTitle(String.format("order no:%s", order.getOrderNo()));
 
         return tradeOrderDto;
     }

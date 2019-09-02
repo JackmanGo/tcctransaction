@@ -1,7 +1,5 @@
 package api;
 
-import java.io.Serializable;
-
 public enum  TccTransactionStatus {
 
     //开启Tcc事务后的初始状态

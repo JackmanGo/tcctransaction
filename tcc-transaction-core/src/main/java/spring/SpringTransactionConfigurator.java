@@ -3,7 +3,6 @@ package spring;
 import config.TccTransactionConfigurator;
 import exception.TccOptimisticLockException;
 import manager.TccTransactionManager;
-import org.springframework.beans.factory.annotation.Autowired;
 import repository.TransactionRepository;
 
 import java.util.HashSet;

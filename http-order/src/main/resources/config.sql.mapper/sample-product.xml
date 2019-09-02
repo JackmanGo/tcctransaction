@@ -5,7 +5,7 @@
     <resultMap id="result"
                type="org.sample.dubbo.order.entity.Product">
         <id property="productId" javaType="java.lang.Long" column="PRODUCT_ID"/>
-        <result property="shopId" column="SHOP_ID"/>
+        <result property="ownerUserId" column="OWNER_USER_ID"/>
         <result property="productName" column="PRODUCT_NAME"/>
         <result property="price" column="PRICE"/>
     </resultMap>
@@ -13,7 +13,7 @@
     <sql id="sql_select">
         SELECT
         PRODUCT_ID,
-        SHOP_ID,
+        OWNER_USER_ID,
         PRODUCT_NAME,
         PRICE
         FROM
@@ -25,8 +25,7 @@
         WHERE PRODUCT_ID = #{productId,javaType=java.lang.Long,jdbcType=BIGINT}
     </select>
 
-    <select id="findByShopId" resultMap="result">
+    <select id="findProducts" resultMap="result">
         <include refid="sql_select"/>
-        WHERE SHOP_ID = #{shopId,javaType=java.lang.Long,jdbcType=BIGINT}
     </select>
 </mapper>

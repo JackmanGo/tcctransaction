@@ -6,8 +6,6 @@ import interceptor.TccTransactionAspectInterceptor;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.core.Ordered;
 
-import java.util.Set;
-
 @Aspect
 public class SpringTccTransactionAspect extends TccTransactionAspect implements Ordered {
 

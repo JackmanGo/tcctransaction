@@ -2,11 +2,11 @@ package org.sample.dubbo.order.proxy;
 
 import api.TccTransaction;
 import api.TccTransactionContext;
-import org.sample.dubbo.cap.api.CapitalTradeOrderService;
-import org.sample.dubbo.cap.api.dto.CapitalTradeOrderDto;
-import org.sample.dubbo.redpacket.api.RedPacketTradeOrderService;
-import org.sample.dubbo.redpacket.api.dto.RedPacketTradeOrderDto;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.tcc.transaction.api.cap.CapitalTradeOrderServiceApi;
+import com.tcc.transaction.api.cap.dto.CapitalTradeOrderDto;
+import com.tcc.transaction.api.redpacket.RedPacketTradeOrderServiceApi;
+import com.tcc.transaction.api.redpacket.dto.RedPacketTradeOrderDto;
+import org.apache.dubbo.config.annotation.Reference;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -33,15 +33,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class OrderRpcServiceProxy {
 
-    @Autowired
-    @Qualifier("captialTradeOrderService")
-    private CapitalTradeOrderService capitalTradeOrderService;
-    @Autowired
-    @Qualifier("redPacketTradeOrderService")
-    private RedPacketTradeOrderService redPacketTradeOrderService;
+    @Reference
+    private CapitalTradeOrderServiceApi capitalTradeOrderService;
+    @Reference
+    private RedPacketTradeOrderServiceApi redPacketTradeOrderService;
 
 
-    //RPC接口，创建钱包使用记录，并扣除钱包该订单使用金额
+    /**
+     *  RPC接口，创建钱包使用记录，并扣除钱包该订单使用金额
+     */
     @TccTransaction(confirmMethod = "capitalRecord", cancelMethod = "capitalRecord")
     public String capitalRecord(CapitalTradeOrderDto tradeOrderDto, TccTransactionContext context){
 
@@ -49,7 +49,9 @@ public class OrderRpcServiceProxy {
         return capResult;
     }
 
-    //RPC接口，创建红包使用记录，并扣除红包该订单使用金额
+    /**
+     *  RPC接口，创建红包使用记录，并扣除红包该订单使用金额
+     */
     @TccTransaction(confirmMethod = "redPacketRecord", cancelMethod = "redPacketRecord")
     public String redPacketRecord(RedPacketTradeOrderDto tradeOrderDto, TccTransactionContext context){
 

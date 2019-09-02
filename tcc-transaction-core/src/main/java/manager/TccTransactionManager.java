@@ -8,11 +8,8 @@ import bean.Transaction;
 import com.alibaba.fastjson.JSON;
 import exception.TccCancelingException;
 import exception.TccConfirmingException;
-import exception.TccSystemException;
 import exception.TccTransactionNotFoundException;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import repository.JdbcTransactionRepository;
 import repository.TransactionRepository;
 
 import java.util.Deque;

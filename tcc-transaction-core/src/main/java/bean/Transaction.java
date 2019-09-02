@@ -1,7 +1,6 @@
 package bean;
 
 import api.*;
-import reflect.ParticipantDetail;
 
 import java.io.Serializable;
 import java.util.ArrayList;

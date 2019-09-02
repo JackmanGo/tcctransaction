@@ -1,12 +1,11 @@
 package org.sample.dubbo.order.service;
 
 import org.sample.dubbo.order.entity.Order;
-import org.sample.dubbo.order.entity.Shop;
+import org.sample.dubbo.order.entity.Product;
 import org.sample.dubbo.order.repository.OrderRepository;
-import org.sample.dubbo.order.repository.ShopRepository;
+import org.sample.dubbo.order.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
@@ -14,7 +13,7 @@ import java.math.BigDecimal;
 public class PlaceOrderServiceImpl {
 
     @Autowired
-    ShopRepository shopRepository;
+    ProductRepository productRepository;
 
     @Autowired
     OrderRepository orderRepository;
@@ -25,22 +24,19 @@ public class PlaceOrderServiceImpl {
     /**
      *
      * @param payerUserId
-     * @param shopId
      * @param productId
      * @param redPacketPayAmount
      * @return 订单号
      */
-    public String placeOrder(long payerUserId, long shopId, Long productId, BigDecimal redPacketPayAmount) throws RuntimeException{
-        Shop shop = shopRepository.findById(shopId);
+    public String placeOrder(long payerUserId, Long productId, BigDecimal redPacketPayAmount) throws RuntimeException{
+        Product product = productRepository.findById(productId);
 
         //生成订单，此时订单的状态为默认 DRAFT
-        Order order = orderRepository.createOrder(payerUserId, shop.getOwnerUserId(), productId);
+        Order order = orderRepository.createOrder(payerUserId, product.getOwnerUserId(), product.getPrice());
 
-        Boolean result = false;
+        //执行扣款。rpc即tcc事务在此时执行
+        paymentService.makePayment(order, redPacketPayAmount, order.getProductAmount().subtract(redPacketPayAmount),null);
 
-        //执行扣款
-        paymentService.makePayment(order, redPacketPayAmount, order.getTotalAmount().subtract(redPacketPayAmount),null);
-
-        return order.getMerchantOrderNo();
+        return order.getOrderNo();
     }
 }

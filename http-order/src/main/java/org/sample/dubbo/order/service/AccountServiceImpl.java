@@ -1,10 +1,11 @@
 package org.sample.dubbo.order.service;
-import org.sample.dubbo.cap.api.CapitalAccountService;
+
+import com.tcc.transaction.api.cap.CapitalAccountServiceApi;
+import com.tcc.transaction.api.redpacket.RedPacketAccountServiceApi;
+import org.apache.dubbo.config.annotation.Reference;
 import org.sample.dubbo.order.OrderApplication;
-import org.sample.dubbo.redpacket.api.RedPacketAccountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -17,11 +18,11 @@ public class AccountServiceImpl {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderApplication.class);
 
-    @Autowired
-    RedPacketAccountService redPacketAccountService;
+    @Reference
+    RedPacketAccountServiceApi redPacketAccountService;
 
-    @Autowired
-    CapitalAccountService capitalAccountService;
+    @Reference
+    CapitalAccountServiceApi capitalAccountService;
 
 
     /**

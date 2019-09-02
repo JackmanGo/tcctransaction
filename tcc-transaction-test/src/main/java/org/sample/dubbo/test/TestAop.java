@@ -1,6 +1,5 @@
 package org.sample.dubbo.test;
 
-import org.aspectj.lang.annotation.Around;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 public class Product implements Serializable{
     private long productId;
 
-    private long shopId;
+    private long ownerUserId;
 
     private String productName;
 
@@ -15,9 +15,9 @@ public class Product implements Serializable{
     public Product() {
     }
 
-    public Product(long productId, long shopId, String productName, BigDecimal price) {
+    public Product(long productId, long ownerUserId, String productName, BigDecimal price) {
         this.productId = productId;
-        this.shopId = shopId;
+        this.ownerUserId = ownerUserId;
         this.productName = productName;
         this.price = price;
     }
@@ -26,8 +26,8 @@ public class Product implements Serializable{
         return productId;
     }
 
-    public long getShopId() {
-        return shopId;
+    public long getOwnerUserId() {
+        return ownerUserId;
     }
 
     public String getProductName() {

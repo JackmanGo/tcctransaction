@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>tcc-transaction-parent</artifactId>
-        <groupId>com.doctorwork.dwframe</groupId>
+        <groupId>com.tcc.transaction</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -68,6 +68,10 @@
                 <exclusion>
                     <groupId>c3p0</groupId>
                     <artifactId>c3p0</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

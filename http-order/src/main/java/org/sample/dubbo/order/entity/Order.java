@@ -1,5 +1,7 @@
 package org.sample.dubbo.order.entity;
 
+import org.sample.dubbo.order.common.OrderStatus;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -10,121 +12,136 @@ import java.util.UUID;
 public class Order implements Serializable {
 
     private static final long serialVersionUID = -5908730245224893590L;
-    private long id;
+    private Long id;
 
-    private long payerUserId;
+    private Long buyerUserId;
 
-    private long payeeUserId;
+    private Long sellerUserId;
 
-    private BigDecimal redPacketPayAmount;
+    private BigDecimal productAmount;
+    private BigDecimal redPacketAmount;
 
-    private BigDecimal capitalPayAmount;
+    private BigDecimal capitalAmount;
 
-    //默认草稿状态
-    private String status = "DRAFT";
+    private Integer status;
 
-    private String merchantOrderNo;
+    private String orderNo;
 
-    private long version = 1l;
-
-    private List<OrderLine> orderLines = new ArrayList<OrderLine>();
+    private Long version = 1L;
 
     public Order() {
 
     }
 
-    public Order(long payerUserId, long payeeUserId) {
-        this.payerUserId = payerUserId;
-        this.payeeUserId = payeeUserId;
-        this.merchantOrderNo = UUID.randomUUID().toString();
-    }
-
-    public long getPayerUserId() {
-        return payerUserId;
-    }
-
-    public long getPayeeUserId() {
-        return payeeUserId;
-    }
-
-    public BigDecimal getTotalAmount() {
-
-        BigDecimal totalAmount = BigDecimal.ZERO;
-
-        for (OrderLine orderLine : orderLines) {
-
-            totalAmount = totalAmount.add(orderLine.getTotalAmount());
-        }
-        return totalAmount;
-    }
-
-    public void addOrderLine(OrderLine orderLine) {
-        this.orderLines.add(orderLine);
-    }
-
-    public List<OrderLine> getOrderLines() {
-        return Collections.unmodifiableList(this.orderLines);
+    public Order(Long buyerUserId, Long sellerUserId) {
+        this.buyerUserId = buyerUserId;
+        this.sellerUserId = sellerUserId;
+        this.orderNo = UUID.randomUUID().toString();
     }
 
     public void pay(BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount) {
-        this.redPacketPayAmount = redPacketPayAmount;
-        this.capitalPayAmount = capitalPayAmount;
-        this.status = "PAYING";
+        this.redPacketAmount = redPacketPayAmount;
+        this.capitalAmount = capitalPayAmount;
+        this.status = OrderStatus.START;
     }
 
-    public BigDecimal getRedPacketPayAmount() {
-        return redPacketPayAmount;
-    }
-
-    public BigDecimal getCapitalPayAmount() {
-        return capitalPayAmount;
-    }
-
-    public String getMerchantOrderNo() {
-        return merchantOrderNo;
-    }
-
-    public void setMerchantOrderNo(String merchantOrderNo) {
-        this.merchantOrderNo = merchantOrderNo;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public String getStatus() {
-        return status;
-    }
 
     public void confirm() {
-        this.status = "CONFIRMED";
+        this.status = OrderStatus.CONFIRM;
     }
 
     public void cancelPayment() {
-        this.status = "PAY_FAILED";
-    }
-
-
-    public long getVersion() {
-        return version;
+        this.status = OrderStatus.CONCEL;
     }
 
     public void updateVersion() {
         version++;
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getBuyerUserId() {
+        return buyerUserId;
+    }
+
+    public void setBuyerUserId(long buyerUserId) {
+        this.buyerUserId = buyerUserId;
+    }
+
+    public long getSellerUserId() {
+        return sellerUserId;
+    }
+
+    public void setSellerUserId(long sellerUserId) {
+        this.sellerUserId = sellerUserId;
+    }
+
+    public BigDecimal getProductAmount() {
+        return productAmount;
+    }
+
+    public void setProductAmount(BigDecimal productAmount) {
+        this.productAmount = productAmount;
+    }
+
+    public BigDecimal getRedPacketAmount() {
+        return redPacketAmount;
+    }
+
+    public void setRedPacketAmount(BigDecimal redPacketAmount) {
+        this.redPacketAmount = redPacketAmount;
+    }
+
+    public BigDecimal getCapitalAmount() {
+        return capitalAmount;
+    }
+
+    public void setCapitalAmount(BigDecimal capitalAmount) {
+        this.capitalAmount = capitalAmount;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public String getOrderNo() {
+        return orderNo;
+    }
+
+    public void setOrderNo(String orderNo) {
+        this.orderNo = orderNo;
+    }
+
+    public long getVersion() {
+        return version;
+    }
+
+    public void setVersion(long version) {
+        this.version = version;
+    }
+
     @Override
     public String toString() {
         return "Order{" +
                 "id=" + id +
-                ", payerUserId=" + payerUserId +
-                ", payeeUserId=" + payeeUserId +
-                ", redPacketPayAmount=" + redPacketPayAmount +
-                ", capitalPayAmount=" + capitalPayAmount +
+                ", buyerUserId=" + buyerUserId +
+                ", sellerUserId=" + sellerUserId +
+                ", productAmount=" + productAmount +
+                ", redPacketAmount=" + redPacketAmount +
+                ", capitalAmount=" + capitalAmount +
                 ", status='" + status + '\'' +
-                ", merchantOrderNo='" + merchantOrderNo + '\'' +
+                ", orderNo='" + orderNo + '\'' +
                 ", version=" + version +
-                ", orderLines=" + orderLines +
                 '}';
     }
 }

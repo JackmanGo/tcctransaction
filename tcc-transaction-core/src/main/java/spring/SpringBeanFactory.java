@@ -2,8 +2,7 @@ package spring;
 
 import factory.BeanFactory;
 import factory.FactoryBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -12,7 +11,7 @@ import java.util.Map;
 
 public class SpringBeanFactory implements BeanFactory, ApplicationContextAware {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SpringBeanFactory.class);
+    private static final Logger LOGGER = Logger.getLogger(SpringBeanFactory.class);
 
     private ApplicationContext applicationContext;
 

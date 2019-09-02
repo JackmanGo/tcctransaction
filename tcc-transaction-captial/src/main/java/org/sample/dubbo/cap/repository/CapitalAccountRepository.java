@@ -3,7 +3,6 @@ package org.sample.dubbo.cap.repository;
 import org.sample.dubbo.cap.dao.CapitalAccountDao;
 import org.sample.dubbo.cap.entity.CapitalAccount;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 @Service

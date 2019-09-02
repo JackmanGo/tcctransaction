@@ -1,26 +1,26 @@
 package org.sample.dubbo.order.web.controller;
 
 import org.sample.dubbo.order.OrderApplication;
+import org.sample.dubbo.order.common.OrderStatus;
 import org.sample.dubbo.order.entity.Order;
 import org.sample.dubbo.order.entity.Product;
 import org.sample.dubbo.order.repository.OrderRepository;
 import org.sample.dubbo.order.repository.ProductRepository;
-import org.sample.dubbo.order.repository.ShopRepository;
 import org.sample.dubbo.order.service.AccountServiceImpl;
 import org.sample.dubbo.order.service.PlaceOrderServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.math.BigDecimal;
 import java.security.InvalidParameterException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-@Controller
+@RestController
 public class OrderController {
 
     /**
@@ -40,72 +40,48 @@ public class OrderController {
     @Autowired
     OrderRepository orderRepository;
 
-    @Autowired
-    ShopRepository repository;
-
-    /**
-     * 主页
-     * @return
-     */
-    @GetMapping("/")
-    public String index() {
-
-        //测试Spring事务传播机制
-        //repository.createFirst();
-        return "index";
-    }
 
     /**
      * 获取 商店 的 所有产品
-     * @param userId 查询的用户id
-     * @param shopId 店铺id
      * @return
      */
-    @GetMapping(value = "/user/{userId}/shop/{shopId}")
-    public ModelAndView getProductsInShop(@PathVariable Long userId,
-                                          @PathVariable Long shopId) {
+    @GetMapping(value = "/products")
+    public Map getProductsInShop() {
 
-        LOGGER.info("userId ==>{}, shopId ===> {}", userId, shopId);
 
-        List<Product> products = productRepository.findByShopId(shopId);
+        List<Product> products = productRepository.findAllProduct();
 
         LOGGER.info("products=>{}", products);
 
-        ModelAndView mv = new ModelAndView("/shop");
+        Map mv = new HashMap(3);
 
-        mv.addObject("products", products);
-        mv.addObject("userId", userId);
-        mv.addObject("shopId", shopId);
+        mv.put("products", products);
+        mv.put("userId", 2000);
 
         return mv;
     }
 
     /**
      * 执行下单操作，查询用户的余额，红包余额
-     * @param userId 下单用户id
-     * @param shopId 下单对店铺
      * @param productId 下单对商品
      * @return
      */
-    @GetMapping(value = "/user/{userId}/shop/{shopId}/product/{productId}/confirm")
-    public ModelAndView productDetail(@PathVariable Long userId,
-                                      @PathVariable Long shopId,
-                                      @PathVariable Long productId) {
+    @GetMapping(value = "/product/{productId}")
+    public Map productDetail(@PathVariable Long productId) {
 
-        LOGGER.info("userId ==>{}, shopId ===> {}, productId ===> {}", userId, shopId, productId);
+        LOGGER.info("userId ==>{},  productId ===> {}", 2000, productId);
 
 
-        ModelAndView mv = new ModelAndView("product_detail");
+        Map mv = new HashMap<>(5);
 
         //查询资金余额 rpc接口
-        mv.addObject("capitalAmount", accountService.getCapitalAccountByUserId(userId));
+        mv.put("capitalAmount", accountService.getCapitalAccountByUserId(2000));
         //查询好包余额 rpc接口
-        mv.addObject("redPacketAmount", accountService.getRedPacketAccountByUserId(userId));
+        mv.put("redPacketAmount", accountService.getRedPacketAccountByUserId(2000));
         //查询商品详情
-        mv.addObject("product", productRepository.findById(productId));
+        mv.put("product", productRepository.findById(productId));
 
-        mv.addObject("userId", userId);
-        mv.addObject("shopId", shopId);
+        mv.put("userId", 2000);
 
         return mv;
     }
@@ -113,28 +89,25 @@ public class OrderController {
     /**
      * 购买
      * @param redPacketPayAmount 使用红包的金额
-     * @param shopId 店铺id
-     * @param payerUserId 购买用户
      * @param productId 商品id
      * @return
      */
-    @PostMapping(value = "/placeorder")
-    public RedirectView placeOrder(@RequestParam Double redPacketPayAmount,
-                                   @RequestParam Long shopId,
-                                   @RequestParam Long payerUserId,
-                                   @RequestParam Long productId) {
+    @GetMapping(value = "/buy/{productId}")
+    public RedirectView placeOrder(@PathVariable Long productId, @RequestParam(required = false, defaultValue = "0") Double redPacketPayAmount) {
 
-        LOGGER.info("redPacketPayAmount ==>{}, shopId ===> {}, payerUserId ===> {}, productId ===> {}",
-                redPacketPayAmount, shopId, payerUserId, productId);
+        LOGGER.info("redPacketPayAmount ==>{}, payerUserId ===> {}, productId ===> {}",
+                redPacketPayAmount,2000, productId);
 
-        if (BigDecimal.valueOf(redPacketPayAmount).compareTo(BigDecimal.ZERO) < 0)
+        if (BigDecimal.valueOf(redPacketPayAmount).compareTo(BigDecimal.ZERO) < 0) {
             throw new InvalidParameterException("invalid red packet amount :" + redPacketPayAmount);
+        }
 
         //创建订单获取订单号，并依次调用RPC来扣除红包和钱包使用的金额
-        String merchantOrderNo = placeOrderService.placeOrder(payerUserId, shopId,
+        String orderNo = placeOrderService.placeOrder(2000,
                 productId, BigDecimal.valueOf(redPacketPayAmount));
 
-        return new RedirectView("/payresult/" + merchantOrderNo);
+        LOGGER.info("orderNo ==>{}", orderNo);
+        return new RedirectView("/payresult/" + orderNo);
     }
 
     /**
@@ -143,25 +116,28 @@ public class OrderController {
      * @return
      */
     @GetMapping(value = "/payresult/{merchantOrderNo}")
-    public ModelAndView getPayResult(@PathVariable String merchantOrderNo) {
+    public Map getPayResult(@PathVariable String merchantOrderNo) {
 
-        ModelAndView mv = new ModelAndView("pay_success");
+        Map mv = new HashMap(3);
 
         String payResultTip = null;
         Order foundOrder = orderRepository.findByMerchantOrderNo(merchantOrderNo);
 
         //查询订单号的订单状态
-        if ("CONFIRMED".equals(foundOrder.getStatus()))
+        if (OrderStatus.CONFIRM.equals(foundOrder.getStatus())) {
             payResultTip = "支付成功";
-        else if ("PAY_FAILED".equals(foundOrder.getStatus()))
+        }
+        else if (OrderStatus.CONCEL.equals(foundOrder.getStatus())) {
             payResultTip = "支付失败";
-        else
+        }
+        else {
             payResultTip = "Unknown";
+        }
 
-        mv.addObject("payResult", payResultTip);
+        mv.put("payResult", payResultTip);
 
-        mv.addObject("capitalAmount", accountService.getCapitalAccountByUserId(foundOrder.getPayerUserId()));
-        mv.addObject("redPacketAmount", accountService.getRedPacketAccountByUserId(foundOrder.getPayerUserId()));
+        mv.put("capitalAmount", accountService.getCapitalAccountByUserId(foundOrder.getBuyerUserId()));
+        mv.put("redPacketAmount", accountService.getRedPacketAccountByUserId(foundOrder.getBuyerUserId()));
 
         return mv;
     }

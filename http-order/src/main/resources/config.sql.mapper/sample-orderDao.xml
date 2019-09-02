@@ -38,42 +38,44 @@
         WHERE ORDER_ID = #{id,javaType=java.lang.Long,jdbcType=BIGINT}
     </select>
 
-    <select id="findByMerchantOrderNo" resultMap="result">
+    <select id="findByOrderNo" resultMap="result">
         <include refid="sql_select"/>
-        WHERE MERCHANT_ORDER_NO = #{findByMerchantOrderNo}
+        WHERE order_no = #{orderNo}
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO ORD_ORDER
+        INSERT INTO ord_order
         (
-        PAYER_USER_ID,
-        PAYEE_USER_ID,
-        RED_PACKET_PAY_AMOUNT,
-        CAPITAL_PAY_AMOUNT,
-        STATUS,
-        MERCHANT_ORDER_NO,
-        VERSION
+        order_no,
+        buyer_user_id,
+        seller_user_id,
+        product_amoun,
+        red_packet_amount,
+        capital_amount,
+        status,
+        version
         )
         VALUES
-            (
-            #{payerUserId},
-            #{payeeUserId},
-            #{redPacketPayAmount},
-            #{capitalPayAmount},
-            #{status},
-            #{merchantOrderNo},
-            #{version}
-            )
+        (
+        #{order_no},
+        #{buyerUserId},
+        #{sellerUserId},
+        #{productAmoun},
+        #{redPacketAmount},
+        #{capitalAmount},
+        #{status},
+        #{version}
+        )
     </insert>
 
     <update id="update" parameterType="org.sample.dubbo.order.entity.Order">
         UPDATE
-        ORD_ORDER
+        ord_order
         SET
-        STATUS = #{status},
-        RED_PACKET_PAY_AMOUNT = #{redPacketPayAmount},
-        CAPITAL_PAY_AMOUNT = #{capitalPayAmount},
-        VERSION = #{version}
-        WHERE ORDER_ID = #{id} AND VERSION=#{version}-1
+        status = #{status},
+        red_packet_amount = #{redPacketAmount},
+        capital_amount = #{capitalAmount},
+        version = #{version}
+        WHERE order_id = #{id} AND version=#{version}-1
     </update>
 </mapper>
