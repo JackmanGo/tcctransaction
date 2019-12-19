@@ -21,6 +21,7 @@
     <module>tcc-transaction-core</module>
     <module>tcc-transaction-test</module>
     <module>tcc-transaction-api</module>
+    <module>mq-transaction-core</module>
   </modules>
 
 </project>

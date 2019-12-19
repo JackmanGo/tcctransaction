@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.sample.dubbo.order.dao.LockTestDao">
+
+    <update id="updateOrderMoney">
+        UPDATE `ORD_ORDER_LINE`
+        SET UNIT_PRICE = UNIT_PRICE+1
+        WHERE ORDER_LINE_ID = #{id}
+    </update>
+    <select id="selectOrderMoney" resultType="java.lang.Integer">
+
+        SELECT UNIT_PRICE
+        FROM ORD_ORDER_LINE
+        WHERE ORDER_LINE_ID = #{id}
+    </select>
+</mapper>

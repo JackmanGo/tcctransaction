@@ -18,10 +18,10 @@ public class AccountServiceImpl {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderApplication.class);
 
-    @Reference
+    //@Reference
     RedPacketAccountServiceApi redPacketAccountService;
 
-    @Reference
+    //@Reference
     CapitalAccountServiceApi capitalAccountService;
 
 

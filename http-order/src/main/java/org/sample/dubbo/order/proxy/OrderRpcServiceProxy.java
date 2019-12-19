@@ -33,9 +33,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class OrderRpcServiceProxy {
 
-    @Reference
+    //@Reference
     private CapitalTradeOrderServiceApi capitalTradeOrderService;
-    @Reference
+    //@Reference
     private RedPacketTradeOrderServiceApi redPacketTradeOrderService;
 
 

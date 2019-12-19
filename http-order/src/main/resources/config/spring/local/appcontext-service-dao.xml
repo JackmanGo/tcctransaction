@@ -16,12 +16,17 @@
 
     <bean id="orderLineDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
         <property name="mapperInterface"
-                  value="org.sample.dubbo.order.dao.OrderLineDao"></property>
+                  value="org.sample.dubbo.order.dao.LockTestDao"></property>
         <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
     </bean>
     <bean id="productDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
         <property name="mapperInterface"
                   value="org.sample.dubbo.order.dao.ProductDao"/>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+    </bean>
+    <bean id="lockTestDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface"
+                  value="org.sample.dubbo.order.dao.LockTestDao"/>
         <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
     </bean>
 
